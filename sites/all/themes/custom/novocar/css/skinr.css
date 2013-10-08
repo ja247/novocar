@@ -1,0 +1,19 @@
+/**
+ * @file skinr.css
+ */ 
+
+/**
+ * remove-border-block
+ * @brief Elimina el borde por defecto de los bloques y lo normaliza.
+ */
+
+.block.remove-border-block
+{
+  
+}
+
+.block.remove-border-block .gutter
+{
+  padding: 0;
+  border: 0;
+}

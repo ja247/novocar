@@ -1,0 +1,48 @@
+/**
+ * @file general.css
+ */ 
+
+/**
+ * Estilo general.
+ */
+#page-inner
+{
+  width: 960px;
+  margin: auto;
+}
+
+.block .gutter
+{
+  padding: 8px;
+  border: 1px solid #C1C1C1;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+
+/**
+ * Encabezado.
+ */
+
+#header-top-wrapper
+{
+  background: #052395;
+  height: 24px;
+}
+
+#header-top-wrapper .block,
+#header-top-wrapper .block .node
+{
+  margin: 0;
+}
+
+#header-top-wrapper .block p
+{
+  margin: 0;
+  line-height: 24px;
+}
+
+.redes-sociales-top-block p img
+{
+  margin-top: 3px;
+}
