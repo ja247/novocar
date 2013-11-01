@@ -17,3 +17,105 @@
   padding: 0;
   border: 0;
 }
+
+
+.remove-border-bottom
+
+{
+
+margin-bottom:0px;
+
+}
+
+/**
+ * Novocar action
+ */
+.novocar-action
+{
+  display: block;
+  width: 100%;
+  max-width: 278px;
+  border: 1px solid #202020;
+  background: #009201;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-webkit-border-radius: 3px;
+  height: 48px;
+  line-height: 48px;
+  color: #FFF;
+  font-size: 20px;
+  text-transform: uppercase;
+  font-family: 'robotoregular';
+  margin: 0 auto;
+  padding: 0 !important;
+  font-weight: normal !important;
+  text-align: center;
+}
+
+.novocar-action:hover,
+.novocar-action:focus
+{
+  text-decoration: none;
+}
+
+/**
+ * Novocar action pdf
+ */
+.novocar-action-pdf
+{
+  display: block;
+  width: 100%;
+  max-width: 278px;
+  border: 1px solid #202020;
+  background: #e90006;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-webkit-border-radius: 3px;
+  height: 48px;
+  line-height: 48px;
+  color: #FFF;
+  font-size: 20px;
+  text-transform: uppercase;
+  font-family: 'robotoregular';
+  margin: 0 auto;
+  padding: 0;
+  font-weight: normal !important;
+  text-align: center;
+}
+
+.novocar-action-pdf:hover,
+.novocar-action-pdf:focus
+{
+  text-decoration: none;
+}
+
+/**
+ * Novocar action back
+ */
+.novocar-action-back
+{
+  display: block;
+  width: 100%;
+  max-width: 278px;
+  border: 1px solid #202020;
+  background: #031B73;
+  border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -o-webkit-border-radius: 3px;
+  height: 48px;
+  line-height: 48px;
+  color: #FFF;
+  font-size: 20px;
+  text-transform: uppercase;
+  font-family: 'robotoregular';
+  margin: 0 auto;
+  padding: 0;
+  font-weight: normal !important;
+  text-align: center;
+}
+
+.novocar-action-back:hover,
+.novocar-action-back:focus
+{
+  text-decoration: none;
+}

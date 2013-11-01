@@ -1,0 +1,36 @@
+/**
+ * @file blog.css
+ */ 
+
+
+.view-pagina-blog .views-row {
+height: 169px;
+border: 1px solid gainsboro;
+padding: 7px;
+border-radius: 4px;
+margin-bottom: 9px;
+}
+
+.view-pagina-blog .views-field.views-field-title {
+font-size: 16px;
+height: 36px;
+}
+
+.view-pagina-blog .views-field.views-field-body {
+height: 117px;
+color: grey;
+}
+
+.view-pagina-blog .views-field.views-field-comment-count {
+float: right;
+}
+
+.view-pagina-blog .views-field-service-links li
+{
+ float:left;
+}
+
+.block ul.links {
+margin-left: 250px;
+margin-top: -23px;
+}

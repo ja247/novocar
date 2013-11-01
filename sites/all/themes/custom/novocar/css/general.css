@@ -9,6 +9,12 @@
 {
   width: 960px;
   margin: auto;
+  background: white;
+  box-shadow: 0px 0px 12px #999;
+  margin-bottom: 30px;
+  border-radius: 0 0 3px 3px;
+  -webkit-border-radius: 0 0 3px 3px;
+  -moz-border-radius: 0 0 3px 3px;
 }
 
 .block .gutter
@@ -24,10 +30,11 @@
  * Encabezado.
  */
 
-#header-top-wrapper
-{
-  background: #052395;
-  height: 24px;
+#header-top-wrapper {
+background: #031B73;
+height: 24px;
+z-index: 999;
+position: relative;
 }
 
 #header-top-wrapper .block,
@@ -45,4 +52,584 @@
 .redes-sociales-top-block p img
 {
   margin-top: 3px;
+}
+
+#logo {
+float: left;
+margin-right: 20px;
+margin-top: 17px;
+margin-left: 12px;
+}
+
+#header-site-info {
+width: auto;
+float: left;
+}
+
+.headercontacto p img {
+margin-right: 7px;
+margin-top: 8px;
+}
+
+
+#block-nodeblock-2 .gutter
+{
+  margin-right: 0px;
+}
+
+.headercontacto p
+{
+  margin-bottom: 0px;
+  line-height: 0px;
+}
+
+.horario a
+{
+  padding: 0px;
+  text-decoration: none;
+  color: white;
+  display: block;
+  border-left: 30px solid transparent;
+  border-bottom: 30px solid #FD6012;
+  height: 0px;
+  line-height: 30px;
+  width: 240px;
+  float: right;
+  padding-right: 20px;
+} 
+
+.headercontacto .textoemail a
+{
+  padding: 0px;
+  text-decoration: none;
+  color: white;
+  display: block;
+  border-left: 36px solid transparent;
+  border-bottom: 36px solid #031B73;
+  height: 0px;
+  line-height: 30px;
+  width: 381px;
+  float: right;
+  padding-right: 13px;
+}
+
+.headercontacto {
+margin-top: 30px;
+height: 79px;
+}
+
+/**
+ * Menu principal
+ */
+
+#main-menu-wrapper
+{
+  margin-bottom: 10px;
+}
+
+.not-front #main-menu-wrapper
+{
+  margin-bottom: 0;
+}
+
+#main-menu-wrapper .gutter
+{
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+
+#block-superfish-1,
+#block-system-main-menu
+{
+  border-bottom: 4px solid #ff6815;
+  background: #031B73;
+  height: 42px;
+  margin-bottom: 0;
+  box-shadow: 0px 0px 12px #999;
+}
+
+#block-superfish-1 .gutter,
+##block-system-main-menu .gutter
+{
+  padding: 0 8px;
+}
+
+#block-superfish-1 li.first,
+#block-superfish-1 li.firstandlast,
+##block-system-main-menu li.first
+{
+  
+}
+
+#block-superfish-1 ul#superfish-1,
+##block-system-main-menu ul.menu
+{
+  display: block;
+  width: 100%;
+  overflow: visible;
+  height: 42px;
+}
+
+#block-superfish-1 li a,
+##block-system-main-menu ul.menu li a
+{
+  padding: 0;
+}
+
+
+.main-menu-inner ul.sf-menu li,
+#block-system-main-menu ul.menu li
+{
+  margin-left: 4px;
+}
+
+.main-menu-inner ul.sf-menu li.first,
+#block-system-main-menu ul.menu li.first
+{
+  margin-left: 0px;
+}
+
+/**
+ * Contenido
+ */
+
+#main-content-inner
+{
+  clear: both;
+}
+
+#block-system-main .gutter
+{
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+}
+
+/*
+ * Pie de Página
+ */
+
+#footer-wrapper
+{
+  width: 100%;
+  background: #1c1c1c;
+  border-top: 6px solid #FD6012;
+  min-height: 170px;
+  -moz-box-shadow: inset 0 4px 7px rgba(0,0,0,.5);
+  -webkit-box-shadow: inset 0 4px 7px rgba(0,0,0,.5);
+  box-shadow: inset 0 4px 7px rgba(0,0,0,.5);
+}
+
+#footer-wrapper .block,
+#footer-bottom-wrapper .block,
+#copyright-wrapper .block
+{
+  margin-bottom: 0;
+}
+
+#footer-wrapper .block .gutter,
+#footer-bottom-wrapper .block .gutter,
+#copyright-wrapper .block .gutter
+{
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+}
+
+#footer-wrapper .block h2.block-title
+{
+  color: #FFF;
+  text-transform: uppercase;
+  font-family: 'roboto_condensedregular';
+  font-size: 14px;
+  line-height: 14px;
+  margin-bottom: 14px;
+}
+
+#footer-wrapper .block-menu
+{
+  margin-top: 10px;
+}
+
+#footer-wrapper .block-menu ul li
+{
+  list-style: 18px;
+}
+
+#footer-wrapper .block-menu ul li span
+{
+  color: #FFF;
+}
+
+.logo-novocar-footer
+{
+  
+}
+
+.logo-novocar-footer p
+{
+  margin: 0;
+}
+
+#footer-bottom-wrapper
+{
+  width: 100%;
+  background: #1c1c1c;
+  border-top: 1px solid black;
+  height: 46px;
+}
+
+#footer-bottom-wrapper .block p
+{
+  line-height: 46px;
+  margin: 0;
+  color: #FFF;
+  font-family: 'robotoregular';
+  font-size: 12px;
+}
+
+#footer-bottom-wrapper .block p b,
+#footer-bottom-wrapper .block p strong
+{
+  font-family: 'robotobold';
+}
+
+#node-7 p
+{
+  margin:0px;
+  line-height: 30px;
+}
+
+#footer-inner
+{
+  margin-top: 20px;
+}
+
+#block-nodeblock-7 .gutter
+{
+  margin-bottom: 0px;
+  height: 30px;
+}
+
+#block-nodeblock-7 .content
+{
+  margin-bottom: 0px;
+  height: 30px;
+}
+
+#block-nodeblock-7
+{
+  margin-bottom: 0px;
+  height: 30px;
+}
+
+.redes-sociales-footer-block table
+{
+  width: 170px;
+  float: right;
+}
+
+.redes-sociales-footer-block table td
+{
+  text-align: right;
+  line-height: 46px;
+  vertical-align: middle;
+  padding-top: 4px;
+  padding-right: 0;
+}
+
+#copyright-wrapper 
+{
+  background: #e7e7e7;
+}
+
+#copyright-wrapper .block,
+#copyright-wrapper .block .node
+{
+  margin: 0;
+}
+
+#copyright-wrapper .block .node p
+{
+  color: #333;
+  font-size: 11px;
+  line-height: 14px;
+  margin: 15px 0;
+}
+
+/**
+ * Menu.
+ */
+
+#block-superfish-1 li a,
+#block-system-main-menu ul.menu li a
+{
+
+color: white;
+text-transform: uppercase;
+display: block;
+height: 46px;
+line-height: 42px;
+padding: 0px 6px;
+font-family: 'robotoregular';
+}
+
+#block-superfish-1 li a:hover,
+#block-system-main-menu li a:hover
+{
+color: #FF6815;
+text-transform: uppercase;
+display: block;
+height: 25px;
+line-height: 25px;
+padding: 0px 6px;
+font-family: 'robotoregular';
+margin-top: 9px;
+}
+
+#block-superfish-1 li.first a:hover,
+#block-superfish-1 li.firstandlast a:hover,
+#block-system-main-menu li.first a:hover
+{
+  background: url(../images/general/home-icon.jpg) no-repeat;
+  width: 44px;
+  height: 46px;
+  text-indent: -9999px;
+  display: block;
+  margin-top: -4px;
+}
+
+#block-superfish-1 li.active-trail a,
+#block-system-main-menu li.active-trail a
+{
+color: #FF6815;
+text-transform: uppercase;
+display: block;
+height: 25px;
+line-height: 25px;
+padding: 0px 6px;
+font-family: 'robotobold' !important;
+margin-top: 9px;
+}
+
+#block-system-main-menu li.active-trail a,
+#block-system-main-menu li a:hover
+{
+  margin-top: 0;
+  color: #FD6012 !important;
+}
+
+#block-superfish-1 li.first,
+#block-system-main-menu li.first
+{
+  -moz-box-shadow: inset 0 0px 0px rgba(0,0,0,.5);
+  -webkit-box-shadow: inset 0 0px 0px rgba(0,0,0,.5);
+  box-shadow: inset 0 0px 0px rgba(0,0,0,.5);
+}
+
+.main-menu-inner ul.sf-menu li.first,
+#block-system-main-menu ul.menu li.first
+{
+width: 54px;
+}
+
+#block-superfish-1 li.first a,
+#block-superfish-1 li.firstandlast a,
+#block-system-main-menu li.first a
+{
+  background: url(../images/general/home-icon.jpg) no-repeat;
+  width: 44px;
+  height: 46px;
+  text-indent: -9999px;
+  display: block;
+  margin-top: -4px;
+}
+
+#novocar-simplenews-subscribe-block-form .form-item, .form-actions {
+margin-top: 1em;
+margin-bottom: 1em;
+text-align: center;
+}
+
+
+.redestop div {
+
+float: left;
+margin-left: 5px;
+
+}
+
+div.redestop {
+float: right;
+margin-top: 2px;
+}
+
+.sprite-facebook-top a:hover{ background: url(../images/general/csg-52692afb4a427.png) no-repeat top left; background-position: 0 0; width: 21px; height: 20px; display: block;} 
+.sprite-facebook-top a{ background: url(../images/general/csg-52692afb4a427.png) no-repeat top left; background-position: 0 -70px; width: 21px; height: 20px; display: block;} 
+.sprite-google-top a:hover{ background: url(../images/general/csg-52692afb4a427.png) no-repeat top left; background-position: 0 -140px; width: 21px; height: 20px; display: block;} 
+.sprite-google-top a{ background: url(../images/general/csg-52692afb4a427.png) no-repeat top left; background-position: 0 -210px; width: 21px; height: 20px; display: block;} 
+.sprite-rss-top a:hover{ background: url(../images/general/csg-52692afb4a427.png) no-repeat top left; background-position: 0 -280px; width: 21px; height: 20px; display: block;} 
+.sprite-rss-top a{ background: url(../images/general/csg-52692afb4a427.png) no-repeat top left; background-position: 0 -350px; width: 21px; height: 20px; display: block;} 
+.sprite-twitter-top a:hover{ background: url(../images/general/csg-52692afb4a427.png) no-repeat top left; background-position: 0 -420px; width: 21px; height: 20px; display: block;} 
+.sprite-twitter-top a{ background: url(../images/general/csg-52692afb4a427.png) no-repeat top left; background-position: 0 -490px; width: 21px; height: 20px; display: block;} 
+.sprite-youtube-top a:hover{ background: url(../images/general/csg-52692afb4a427.png) no-repeat top left; background-position: 0 -560px; width: 21px; height: 20px; display: block;} 
+.sprite-youtube-top a{ background: url(../images/general/csg-52692afb4a427.png) no-repeat top left; background-position: 0 -630px; width: 21px; height: 20px; display: block;} 
+
+
+/**
+ * BLOG, VIDEOS, SOCIAL.
+ */
+
+
+#block-quicktabs-multibloque_blog_videos_social .gutter
+{
+padding: 0px;
+border: 0px;
+border-radius: 0px;
+-moz-border-radius: 0px;
+-webkit-border-radius: 0px;
+}
+
+#quicktabs-container-multibloque_blog_videos_social .gutter
+{
+padding: 8px;
+border: 1px solid #C1C1C1;
+border-radius: 3px;
+-moz-border-radius: 3px;
+-webkit-border-radius: 3px;
+margin-left: 0px;
+margin-right: 0px;
+}
+
+#quicktabs-multibloque_blog_videos_social {
+border-bottom: 5px solid orangered;
+}
+
+#block-quicktabs-portada_coches ul.quicktabs-tabs li {
+height: 24px;
+float:left;
+width: 87px;
+margin-left: -17px;
+margin-right: 14px;
+display: inline-block;
+}
+
+#quicktabs-tab-multibloque_blog_videos_social li.last a {
+background: url("/sites/all/themes/custom/novocar/images/portada/pestaoff2.png");
+z-index: 400;
+position:relative;
+margin-top: 3px;
+height: 27px;
+}
+
+
+
+#block-quicktabs-multibloque_blog_videos_social li.first a {
+background: url("/sites/all/themes/custom/novocar/images/portada/pestaoff.png");
+z-index: 430;
+position:relative;
+margin-left: 1px;
+width: 81px;
+padding-left: 27px;
+margin-top: 3px;
+}
+
+#block-quicktabs-multibloque_blog_videos_social li a {
+background: url("/sites/all/themes/custom/novocar/images/portada/pestaoff.png");
+font-family: 'robotoregular';
+color: white;
+font-size: 14px;
+text-transform: uppercase;
+display: inline-block;
+line-height: 29px;
+text-decoration: none;
+z-index: 420;
+position: relative;
+height: 27px;
+margin-top: 3px;
+width: 85px;
+padding-left: 23px;
+margin-left: -21px;
+}
+
+
+
+#block-quicktabs-multibloque_blog_videos_social li.active a {
+background: url("/sites/all/themes/custom/novocar/images/portada/pestactive.png");
+z-index: 600;
+position:relative;
+}
+
+#block-quicktabs-multibloque_blog_videos_social li.last.active a{
+background: url("/sites/all/themes/custom/novocar/images/portada/pestactive.png");
+z-index: 400;
+position:relative;
+margin-top: 3px;
+height: 27px;
+}
+
+ul.quicktabs-tabs.quicktabs-style-nostyle {
+margin-left: -3px;
+margin-bottom: -1px;
+}
+
+.views-field.views-field-field-blog-imagen img {
+border: 1px solid #C1C1C1;
+padding: 3px;
+}
+
+.views-field.views-field-field-blog-imagen {
+float: left;
+margin-right: 8px;
+}
+
+#block-views-bloque_blog-block .views-row {
+margin-top: 4px;
+margin-bottom: 17px;
+}
+
+#block-views-bloque_blog-block .views-row-last {
+margin-top: 4px;
+margin-bottom: 0px;
+}
+
+#block-views-bloque_blog-block .views-field.views-field-body {
+margin-top: 0;
+font-size: 12px;
+font-family: 'robotoregular', Verdana, Arial;
+color: #696969;
+line-height: 16px;
+}
+
+#block-views-bloque_videos-block img
+{
+border: 1px solid #C1C1C1;
+padding: 3px;
+}
+
+#block-views-bloque_videos-block .views-row {
+margin-top: 4px;
+margin-bottom: 17px;
+}
+
+#block-views-bloque_videos-block .views-row-last {
+margin-top: 4px;
+margin-bottom: 0px;
+}
+
+#block-views-bloque_videos-block .views-field-field-video-video
+{
+ float:left;
+ margin-right: 8px;
+}
+
+#block-views-bloque_videos-block .views-row {
+margin-top: 4px;
+margin-bottom: 17px;
+height: 84px;
 }

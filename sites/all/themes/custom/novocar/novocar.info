@@ -9,7 +9,15 @@ stylesheets[all][] = css/novocar.css
 stylesheets[all][] = css/elementos-html.css
 stylesheets[all][] = css/general.css
 stylesheets[all][] = css/portada.css
+stylesheets[all][] = css/busqueda.css
+stylesheets[all][] = css/coche.css
 stylesheets[all][] = css/skinr.css
+stylesheets[all][] = css/fonts.css
+stylesheets[all][] = css/blog.css
+
+scripts[] = js/select_list_themed.js
+scripts[] = js/jquery.animate-colors-min.js
+scripts[] = js/novocar.js
 
 ; --------------------------------------------------------------------------------
 ; This provides support for the Fusion Accelerator suite.  
@@ -32,6 +40,8 @@ regions[content] = Content
 regions[postscript_top] = Postscript top
 regions[postscript_bottom] = Postscript bottom
 regions[footer] = Footer
+regions[footer_bottom] = Footer bottom
+regions[copyright] = Copyright
 regions[node_top] = Node top
 regions[node_bottom] = Node bottom
 regions[help] = Help

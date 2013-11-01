@@ -53,6 +53,9 @@ a.button:active {
 /* HTML Elements
 -------------------------------------------------------------- */
 body {
+
+background: url("/sites/all/themes/custom/novocar/images/general/bg.png");
+
 }
 
 /* Site Info

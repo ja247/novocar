@@ -1,0 +1,391 @@
+/**
+ * @file busqueda.css
+ */
+
+#novocar-search-search
+{
+  position: relative;
+  overflow: hidden;
+}
+
+/**
+ * Formulario.
+ */
+#novocar-search-search-form form
+{
+}
+
+#novocar-search-search-form #novocar-search-search-form-wrapper
+{
+  padding: 19px;
+  border: 1px solid #c1c1c1;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background: #e1dfe0;
+}
+
+#novocar-search-search-form .first-column
+{
+  width: 280px;
+  float: left;
+  margin-bottom: 8px;
+}
+
+#novocar-search-search-form .first-column .form-item
+{
+  margin: 0;
+}
+
+#novocar-search-search-form .first-column label,
+#novocar-search-search-form .second-column label
+{
+  width: 100px;
+  float: left;
+}
+
+#novocar-search-search-form .first-column .ajax-progress,
+#novocar-search-search-form .second-column .ajax-progress
+{
+  display: none !important;
+}
+
+#novocar-search-search-form .first-column .ajax-progress .throbber,
+#novocar-search-search-form .second-column .ajax-progress .throbber
+{
+  display: none;
+}
+
+#novocar-search-search-form .second-column
+{
+  width: 280px;
+  float: right;
+  margin-bottom: 8px;
+}
+
+#novocar-search-search-form .second-column .form-item
+{
+  width: 85px;
+  float: left;
+  margin: 0;
+}
+
+#novocar-search-search-form .second-column #novocar-search-prize-to .form-item,
+#novocar-search-search-form .second-column #novocar-search-km-to .form-item,
+#novocar-search-search-form .second-column #novocar-search-year-to .form-item
+{
+  margin-left: 10px;
+}
+
+#novocar-search-search-form .second-column .form-item label
+{
+  display: none;
+}
+
+#novocar-search-search-form .second-column .select-list-span-text
+{
+  width: 46px;
+  padding-left: 8px;
+}
+
+#novocar-search-search-form .second-column .select-list-span-icon
+{
+  width: 25px;
+  margin-right: 0;
+  background-position: 0 center;
+}
+
+#novocar-search-search-form input.novocar-action
+{
+  width: 290px;
+  margin: auto;
+}
+
+#novocar-search-search-form .ajax-progress
+{
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  text-align: center;
+  z-index: 100;
+  background: url(../images/general/ajax-loader.gif) no-repeat 470px 168px;
+}
+
+#novocar-search-search-form .ajax-progress .throbber
+{
+  width: 100%;
+  height: 100%;
+  padding-top: 50%;
+  background: none;
+  float: none;
+}
+
+#novocar-search-search-results .ajax-progress,
+#novocar-search-search-results .ajax-progress .throbber
+{
+  display: none !important;
+}
+
+/**
+ * Resultados.
+ */
+
+#novocar-search-search-results
+{
+  margin-top: 20px;
+}
+
+#novocar-search-search-results .results-title-wrapper
+{
+  overflow: hidden;
+}
+
+#novocar-search-search-results .results-title-wrapper h2
+{
+  height: 30px;
+  width: 580px;
+  float: left;
+  line-height: 30px;
+  color: #FFF;
+  font-family: 'roboto_condensedbold';
+  font-weight: normal;
+  background: #FF6815;
+  padding-left: 10px;
+  text-transform: uppercase;
+  margin-bottom: 0;
+}
+
+#novocar-search-search-results .results-title-wrapper .title-results-helper
+{
+  border-bottom: 30px solid #FF6815;
+  border-right: 30px solid transparent;
+  float: right;
+}
+
+.view-novocar-search-result .view-content
+{
+  margin-top: -30px;
+}
+
+.view-novocar-search-result thead th
+{
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  text-align: center;
+  border: none;
+  font-size: 15px;
+}
+
+.view-novocar-search-result thead th a
+{
+  color: #FFF;
+  text-transform: uppercase;
+  font-weight: normal;
+  font-family: 'roboto_condensedbold';
+}
+
+.view-novocar-search-result .views-field-field-coche-precio,
+.view-novocar-search-result .views-field-field-coche-kilometros,
+.view-novocar-search-result .views-field-field-coche-precio
+{
+  width: 120px;
+}
+
+.view-novocar-search-result .views-field-field-coche-imagen-principal
+{
+  width: 180px;
+  padding-right: 0;
+}
+
+.view-novocar-search-result .views-field-nothing
+{
+  padding-left: 0;
+  width: 120px;
+  text-align: left;
+}
+
+.view-novocar-search-result .view-empty
+{
+  border: 1px solid #c1c1c1;
+  -webkit-border-bottom-right-radius: 3px;
+  -webkit-border-bottom-left-radius: 3px;
+  -moz-border-radius-bottomright: 3px;
+  -moz-border-radius-bottomleft: 3px;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.view-novocar-search-result .view-empty p
+{
+  margin: 0;
+  text-transform: uppercase;
+  font-family: 'roboto_condensedregular';
+  padding: 20px;
+  font-size: 18px;
+}
+
+.view-novocar-search-result .views-field-nothing ul
+{
+  margin: 0;
+  padding: 0;
+}
+
+.view-novocar-search-result .views-field-nothing ul li
+{
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+}
+
+.view-novocar-search-result .views-field-nothing ul li.first
+{
+  text-transform: uppercase;
+  font-family: 'roboto_condensedregular';
+  font-size: 16px;
+  line-height: 16px;
+  color: #031B73;
+}
+
+.view-novocar-search-result .views-field-nothing ul li.last
+{
+  text-transform: uppercase;
+  font-family: 'roboto_condensedregular';
+  font-size: 20px;
+  color: #031B73;
+  line-height: 24px;
+}
+
+.view-novocar-search-result .views-field-nothing h5
+{
+  text-transform: uppercase;
+  font-family: 'roboto_condensedregular';
+  font-size: 14px;
+  color: #031B73;
+  line-height: 24px;
+  font-weight: normal;
+}
+
+.view-novocar-search-result .views-field-nothing h4
+{
+  font-weight: normal;
+  font-family: 'robotoregular';
+  color: #000;
+}
+
+.view-novocar-search-result .views-field-field-coche-imagen-principal a
+{
+  position: absolute;
+  z-index: 10;
+  width: 620px;
+  height: 142px;
+  margin-top: -10px;
+  margin-left: -10px;
+  text-indent: -9999px;
+}
+
+.view-novocar-search-result table.views-table
+{
+  width: 619px;
+}
+
+.view-novocar-search-result table.views-table tbody tr
+{
+  position: relative;
+  height: 142px;
+  overflow: hidden;
+  background: #FFF;
+}
+
+.view-novocar-search-result .views-field-field-coche-imagen-principal img
+{
+  padding: 4px;
+  border: 1px solid #c1c1c1;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  -webkit-border-bottom-right-radius: 3px;
+  -webkit-border-bottom-left-radius: 3px;
+  -moz-border-radius-bottomright: 3px;
+  -moz-border-radius-bottomleft: 3px;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.view-novocar-search-result tbody
+{
+  border: 1px solid #C1C1C1;
+  border-top: 0;
+}
+
+.view-novocar-search-result tbody tr
+{
+  border: 0;
+  padding: 0;
+  background: none;
+}
+
+.view-novocar-search-result tbody td
+{
+  padding: 10px;
+  border: 0;
+  background: none;
+}
+
+.view-novocar-search-result td.views-field-field-coche-precio,
+.view-novocar-search-result td.views-field-field-coche-kilometros,
+.view-novocar-search-result td.views-field-field-coche-motor
+{
+  text-align: center;
+  color: #000;
+  font-family: 'robotoregular';
+  background: url(../images/coche/result-separator.jpg) 0 center no-repeat;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.view-novocar-search-result td.views-field-field-coche-precio
+{
+  color: #009201;
+  font-size: 20px;
+}
+
+ul.pager
+{
+
+}
+
+ul.pager li
+{
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border: 1px solid #c1c1cd;
+  height: 20px;
+  line-height: 20px;
+  padding: 3px;
+  padding: 5px !important;
+  font-family: 'robotoregular';
+}
+
+ul.pager li a,
+ul.pager li a:hover
+{
+  background: none;
+  border: none;
+  line-height: 20px;
+  padding: 0;
+  font-family: 'robotoregular';
+}
+
+ul.pager li a:hover
+{
+  color: #FF6815;
+}
+
+ul.pager li.pager-current
+{
+  background: #FF6815;
+}

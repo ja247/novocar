@@ -1,3 +1,241 @@
 /**
  * @file elementos-html.css
  */ 
+
+/**
+ * Body
+ */
+body
+{
+  font-family: 'robotoregular', Helvetica;
+  font-size: 14px;
+  line-height: 14px;
+  color: #333;
+}
+
+/**
+ *  Headers
+ */
+
+.not-front #title-wrapper
+{
+  clear: both;
+  width: 100%;
+  overflow: visible;
+  background: url(../images/general/h1-prefix.png) no-repeat bottom left;
+  margin-left: -9px;
+  padding-bottom: 7px;
+  margin-bottom: 13px;
+  margin-top: -4px;
+}
+
+.not-front #title-wrapper-inner
+{
+  overflow: hidden;
+}
+
+.not-front #title-wrapper h1.title
+{
+  height: 50px;
+  line-height: 50px;
+  font-family: 'roboto_condensedregular';
+  color: #FFF;
+  font-weight: normal;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+  padding-left: 20px;
+  display: inline-block;
+  text-transform: uppercase;
+  padding-right: 100px;
+  background: #FF6815;
+  float: left;
+}
+
+.not-front .title-helper
+{
+  display: block;
+  float: left;
+  border-bottom: 50px solid #FF681D;
+  border-right: 50px solid transparent;
+  width: 0;
+  height: 0;
+  position: relative;
+  z-index: 1;
+}
+
+h2
+{
+ font-weight:normal;
+}
+
+/**
+ * Paragraphs
+ */
+p
+{
+  margin: 10px 0;
+  font-family: 'robotoregular';
+  font-size: 14px;
+  line-height: 14px;
+  color: #555;
+  text-align: justify;
+}
+
+/**
+ * Hyperlinks
+ */
+
+a
+{
+  color: #FD6012;
+}
+
+/**
+ * List
+ */
+
+ul,
+ul.menu
+{
+  margin: 0;
+  padding: 0;
+}
+
+ul li,
+ul.menu li
+{
+  list-style: none inside none;
+}
+
+/**
+ *  Table
+ */
+table,
+table thead,
+table thead tr,
+table thead th th,
+table tbody,
+table tbody tr,
+table tbody tr td
+{
+  border: 0;
+}
+
+/**
+ * Selector tematizable.
+ */
+
+.select-list-wrapper
+{
+  overflow: hidden;
+  position: relative;
+  height: 44px;
+}
+
+.select-list-wrapper:hover
+{
+  cursor: pointer;
+}
+
+.select-list-wrapper select
+{
+  opacity: 0;
+  filter: alpha(opacity = 0);
+  position: absolute;
+  z-index: 1;
+  height: 32px;
+  width: 100%;
+  max-width: 280px !important;
+  display: block;
+}
+
+.select-list-wrapper select:hover
+{
+  cursor: pointer;
+}
+
+.select-list-span
+{
+  display: block;
+  width: auto;
+  height: 30px;
+  background: #FFF;
+  overflow: hidden;
+  border: 1px solid #C1C1C1;
+  max-width: 280px !important;
+  border-radius: 3px;
+  -o-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+
+.select-list-span.error
+{
+  background: #A14;
+}
+
+.select-list-span .select-list-span-text
+{
+  width: 80%;
+  padding-left: 5%;
+  float: left;
+  background: #FFF;
+  height: 28px;
+  line-height: 28px;
+  font-family: 'robotoregular', Helvetica;
+  padding-top: 2px;
+  color: #414141;
+  font-size: 14px;
+}
+
+.select-list-span .select-list-span-icon
+{
+  width: 10%;
+  margin-right: 5%;
+  float: right;
+  background: url('../images/general/select-list-arrow.jpg') no-repeat center center;
+  height: 30px;
+}
+
+.select-list-span.error .select-list-span-icon
+{
+  background: url('../images/general/select-list-arrow-error.jpg') no-repeat center center;
+}
+
+.select-list-span.disabled
+{
+  background: #EEE;
+}
+
+.select-list-span.disabled .select-list-span-text
+{
+  background: #EEE; 
+}
+
+.select-list-span.disabled .select-list-span-icon
+{
+  background: url('../images/general/select-list-arrow-disabled.jpg') no-repeat center center #EEE;
+}
+
+select options
+{
+  font-family: 'robotoregular', Helvetica;
+}
+
+/**
+ * Label
+ */
+label
+{
+  font-family: 'robotobold';
+  font-size: 14px;
+  font-weight: normal;
+  float: left;
+  line-height: 32px;
+}
+
+div.form-type-checkbox label
+{
+  float:none;
+  font-family: 'robotoregular';
+}
