@@ -1,0 +1,86 @@
+<?php
+/**
+ * @file  novocar_contact.install
+ *
+ * @brief Proceso de instalación/desinstalación del módulo.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function novocar_contact_schema() {
+
+  $schema = array();
+
+  # Tabla donde guardamos las solicitudes de información/contacto.
+  $schema['novocar_contact'] = array(
+    'description' => 'Solicitud de contacto de coche realizados en la web.',
+    'fields'      => array(
+      'id'          => array(
+        'description' => 'Identificador único.',
+        'type'        => 'serial',
+        'unsigned'    => TRUE,
+        'not null'    => TRUE,
+      ),
+      'nid'         => array(
+        'description' => 'Contenido sobre el que se quiere contactar.',
+        'type'        => 'int',
+        'not null'    => TRUE,
+      ),
+      #@NOTE no hacemos el campo de tipo "boolean" para permitir en un futuro añadir nuevos estados (archivado, exitoso..).
+      'status'      => array(
+        'description' => 'Estado de la solicitud', #0 = Contestado /1 = No contestado.
+        'type'        => 'int',
+        'not null'    => TRUE,
+        'default'     => 0,
+      ),
+      'created'     => array(
+        'description' => 'Marca temporal Unix de la creación del registro.',
+        'type'        => 'int',
+        'not null'    => TRUE,
+        'default'     => 0,
+      ),
+      'name' => array(
+        'description' => 'Name.',
+        'type'        => 'varchar',
+        'length'      => 255,
+      ),
+      'phone' => array(
+        'description' => 'Phone.',
+        'type'        => 'varchar',
+        'length'      => 255,
+      ),
+      'mail' => array(
+        'description' => 'Mail',
+        'type'        => 'varchar',
+        'length'      => 255,
+      ),
+      'contenido'   => array(
+        'type'        => 'text',
+        'not null'    => FALSE,
+        'size'        => 'medium',
+        'description' => 'Contenido del contacto',
+      ),
+      'ip'          => array(
+        'description' => 'IP del solicitante',
+        'type'        => 'varchar',
+        'length'      => 255,
+      ),
+      'data'        => array(
+        'description' => 'Data',
+        'type'        => 'blob',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function novocar_contact_uninstall() {
+
+  drupal_uninstall_schema('novocar_contact');
+}

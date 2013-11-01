@@ -1,0 +1,4 @@
+name = Novocar General
+description = Funcionalides generales y comunes del sitio Novocar.
+package = Novocar
+core = 7.x

@@ -1,0 +1,141 @@
+<?php
+/**
+ * @file  novocar_simplenews.module
+ *
+ * @brief Funcionalidades relacionadas con la suscripción de usuarios.
+ */
+
+# Variables
+## Introducción
+define('NS_INTRO', '<p class="rtecenter"><img alt="Subscribete a Novocar para recibir oferas en tu email" src="/sites/all/modules/custom/novocar_simplenews/images/subscribe-default-image.jpg" /></p>
+<p class="rtecenter">Sé el primero en recibir por email nuestras novedades así como nuestros descuentos exclusivos.</p>
+');
+
+/**
+ * Implements hook_theme().
+ */
+function novocar_simplenews_theme() {
+
+  $themes = array(
+    'novocar_simplenews_subscribe_block' => array(
+      'template'  => 'novocar-simplenews-subscribe-block',
+      'path'      => drupal_get_path('module', 'novocar_simplenews') . '/theme',
+      'variables' => array(),
+    ),
+  );
+
+  return $themes;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function novocar_simplenews_menu() {
+
+  $items = array();
+
+  $items['admin/novocar/simplenews'] = array(
+    'title'            => 'Configuración de la suscripción de usuarios.',
+    'access arguments' => array('admin novocar_simplenews'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('novocar_simplenews_settings_form'),
+    'weight'           => 9,
+    'file'             => 'inc/novocar_simplenews.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function novocar_simplenews_block_info() {
+
+  $blocks = array();
+
+  $blocks['novocar_simplenews_subscribe'] = array(
+    'info'  => t('Novocar: Bloque de suscripción'),
+    //'cache' => DRUPAL_CACHE_GLOBAL,
+    'cache' => DRUPAL_NO_CACHE,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function novocar_simplenews_block_view($delta = '') {
+
+  switch ($delta) {
+    case 'novocar_simplenews_subscribe':
+  
+      $block['subject'] = '';
+      $block['content'] = array(
+	'#theme' => 'novocar_simplenews_subscribe_block',
+      );
+
+    break;
+  }
+
+  return $block;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function novocar_simplenews_permission() {
+  return array(
+    'admin novocar_simplenews' => array(
+      'title'       => t('Administrar novocar_simplenews'),
+      'description' => t('Permite administrar el módulo de suscripción.'),
+    ),
+  );
+}
+
+/**
+ * Implements template_preprocess_novocar_simplenews_subscribe_block().
+ */
+function template_preprocess_novocar_simplenews_subscribe_block(&$vars) {
+
+  $intro = variable_get('novocar_simplenews_intro', array('value' => NS_INTRO, 'format' => NC_FORMAT));
+
+  $vars['intro'] = check_markup($intro['value'], $intro['format']);
+
+  $form = drupal_get_form('novocar_simplenews_subscribe_form');
+
+  $vars['form'] = $form;
+}
+
+/**
+ * @brief Función que genera el formulario de suscripción.
+ */
+function novocar_simplenews_subscribe_form($form_state) {
+
+  $form = array();
+
+  $form['mail'] = array(
+    '#title'  => '',
+    '#type'   => 'textfield',
+    '#attributes' => array(
+      'placeholder' => 'correo electrónico',
+    ),
+  );
+
+  $form['privacidad'] = array(
+    '#type'  => 'checkbox',
+    '#title' => (NG_PP_1),
+  );
+
+  $form['subscribe'] = array(
+    '#type'  => 'submit',
+    '#value' => t('Suscribirme'),
+    '#attributes' => array(
+      'class' => array(
+	'novocar-action',
+      ),
+    ),
+  );
+
+  return $form;
+}

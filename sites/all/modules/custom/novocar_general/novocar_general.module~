@@ -1,0 +1,25 @@
+<?php
+/**
+ * @file  novocar_general.module
+ *
+ * @brief Funcionalides generales y comunes del sitio Novocar.
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function novocar_general_menu() {
+
+  $items = array();
+
+  $items['admin/novocar'] = array(
+    'title'            => 'Novocar',
+    'access arguments' => array('access administration pages'),
+    'page callback'    => 'system_admin_menu_block_page',
+    'weight'           => 9,
+    'file' => 'system.admin.inc',
+    'file path' => drupal_get_path('module', 'system'),
+  );
+
+  return $items;
+}

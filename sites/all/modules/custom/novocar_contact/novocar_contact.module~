@@ -1,0 +1,37 @@
+<?php
+/**
+ * @file  novocar_contact.module
+ *
+ * @brief Módulo que añade la funcionalidad de contacto específico para Novocar.
+ */
+
+
+/**
+ * Implements hook_menu().
+ */
+function novocar_contact_menu() {
+
+  $items = array();
+
+  $items['admin/novocar/contact'] = array(
+    'title'            => 'Configuración del contacto',
+    'access arguments' => array('admin novocar_contact'),
+    'page callback'    => 'novocar_contact_settings_form',
+    'weight'           => 9,
+    'file'             => 'inc/novocar_contact.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function novocar_contact_permission() {
+  return array(
+    'admin novocar_contact' => array(
+      'title'       => t('Administrar novocar_contact'),
+      'description' => t('Permite administrar el módulo de contacto..'),
+    ),
+  );
+}

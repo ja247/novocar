@@ -1,0 +1,6 @@
+name = Novocar Search
+description = Funcionalidades relacionadas con la búsqueda de vehículos.
+package = Novocar
+core = 7.x
+
+dependencies[] = novocar_general

@@ -1,0 +1,831 @@
+<?php
+/**
+ * @file  novocar_search.module
+ *
+ * @brief Funcionalidades relacionadas con la búsqueda de vehículos.
+ */
+
+# Rangos por defecto.
+## Kilómetros.
+### Kilómetros iniciales.
+define('NS_KM_START', 0);
+### Kilómetros máximos.
+define('NS_KM_END', 200000);
+### Rango de kilómetros.
+define('NS_KM_RANGE', 20000);
+
+## Año.
+### Año inicial.
+define('NS_YEAR_START', 2000);
+### Año máximo.
+define('NS_YEAR_END', 2013);
+### Rango de año.
+define('NS_YEAR_RANGE', 1);
+
+# Rutas por defecto.
+## Buscador de coche.
+define('NS_URL_SEARCH', 'buscar-coche');
+
+
+/**
+ * Implements hook_menu().
+ */
+function novocar_search_menu() {
+
+  $items = array();
+
+  $items[NS_URL_SEARCH] = array(
+    'title'            => 'Buscar mi coche',
+    'access arguments' => array('access content'),
+    'page callback'    => 'novocar_search_search_callback',
+    'weight'           => 0,
+    'file'             => 'inc/novocar_search.pages.inc',
+  );
+
+  return $items;
+}
+
+function novocar_search_front_callback() {
+
+  return '';
+}
+
+/**
+ * Implements hook_theme().
+ */
+function novocar_search_theme() {
+
+  $themes = array(
+    'novocar_search_search'      => array(
+      'template'  => 'novocar-search-search',
+      'path'      => drupal_get_path('module', 'novocar_search') . '/theme',
+      'variables' => array(),
+    ),
+    'novocar_search_lite_search' => array(
+      'template'  => 'novocar-search-lite-search',
+      'path'      => drupal_get_path('module', 'novocar_search') . '/theme',
+      'variables' => array(),
+    ),
+  );
+
+  return $themes;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function novocar_search_block_info() {
+
+  $blocks = array();
+
+  $blocks['novocar_search_lite_search'] = array(
+    'info'  => t('Novocar: Bloque de búsqueda "lite"'),
+    //'cache' => DRUPAL_CACHE_GLOBAL, # TODO
+    'cache' => DRUPAL_NO_CACHE,
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function novocar_search_form_alter(&$form, &$form_state, $form_id) {
+
+  switch ($form_id) {
+    case NG_CTYPE_COCHE . '_node_form':
+      # Ocultamos el campo "Precio" (término).
+      $form['field_coche_precio_term']['#access'] = FALSE;
+      # Ocultamos el campo "Kilómetros" (término).
+      $form['field_coche_kilometros_term']['#access'] = FALSE;
+    break;
+  }
+}
+
+/**
+ * Implements hook_node_presave().
+ */
+function novocar_search_node_presave($node) {
+
+  if ($node->type == NG_CTYPE_COCHE) {
+
+    # Calculamos el término correspondiente a partir del precio real y lo fijamos.
+    ## Precio
+    $prize      = $node->field_coche_precio['und'][0]['value'];
+    $prize_term = novocar_general_get_term_between($prize, NG_PRECIO_VIC);
+
+    if ($prize_term) {
+      $node->field_coche_precio_term['und'][0]['tid'] = $prize_term;
+    }
+
+    ## Kilómetros
+    $km      = $node->field_coche_kilometros['und'][0]['value'];
+    $km_term = novocar_general_get_term_between($km, NG_KM_VIC);
+
+    if ($km_term) {
+      $node->field_coche_kilometros_term['und'][0]['tid'] = $km_term;
+    }
+  }
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function novocar_search_block_view($delta = '') {
+
+  switch ($delta) {
+    case 'novocar_search_lite_search':
+  
+      $block['subject'] = '';
+      $block['content'] = array(
+	'#theme' => 'novocar_search_lite_search',
+      );
+
+    break;
+  }
+
+  return $block;
+}
+
+/**
+ * Implements template_preprocess_novocar_search_search().
+ */
+function template_preprocess_novocar_search_search(&$vars) {
+
+  drupal_add_js(drupal_get_path('module', 'novocar_search') . '/js/novocar_search.js');
+
+  # Formulario.
+  $form = drupal_get_form('novocar_search_search_form');
+
+  $vars['form'] = $form;
+
+  # Resultados.
+  ## Modelo.
+  $modelo_arguments = array();
+
+
+  if (isset($_GET['marca'])) {
+    $modelo_arguments[] = $_GET['marca'];
+  }
+
+  if (isset($_GET['modelo'])) {
+    $modelo_arguments[] = $_GET['modelo'];
+  }
+
+  $modelo = (count($modelo_arguments) > 0) ? implode(',', $modelo_arguments) : 'all';
+
+  ## Precio.
+  $price_arguments  = array();
+  if (isset($_GET['prize_from']) && $_GET['prize_from'] && isset($_GET['prize_to']) && $_GET['prize_to']) {
+    $price_arguments = novocar_general_get_term_between_min_max($_GET['prize_from'], $_GET['prize_to'], NG_PRECIO_VIC);
+  }
+
+  $price  = (count($price_arguments) > 0) ? implode('+', $price_arguments) : 'all';
+
+  $vars['results'] = views_embed_view('novocar_search_result', 'default', $modelo, $price, 'all', 'all');
+}
+
+/**
+ * Implements template_preprocess_novocar_search_lite_search().
+ */
+function template_preprocess_novocar_search_lite_search(&$vars) {
+
+  # Formulario.
+  $form = drupal_get_form('novocar_search_lite_search_form');
+
+  $vars['form'] = $form;
+}
+
+/**
+ * @brief Función que genera el formulario de búsqueda.
+ */
+function novocar_search_search_form($form, $form_state) {
+
+  $form = array();
+
+  $form['#prefix'] = '<div id="novocar-search-search-form-wrapper">';
+  $form['#suffix'] = '</div>';
+  # Marca.
+  $marca_options = array('-' => t('Todas las marcas')) + novocar_general_get_terms_by_vid(NG_MODELO_VIC);
+
+  if (!isset($form_state['values']['marca']) && isset($_GET['marca']) && isset($marca_options[$_GET['marca']])) {
+    $marca_default_value = $_GET['marca'];
+    $marca = TRUE;
+  }
+  elseif (isset($form_state['values']['marca']) && $form_state['values']['marca'] != '-') {
+    $marca_default_value = $form_state['values']['marca'];
+    $marca = TRUE;
+  }
+  else {
+    $marca_default_value = '-';
+    $marca = FALSE;
+  }
+
+  $form['marca'] = array(
+    '#title'         => t('Marca'),
+    '#type'          => 'select',
+    '#options'       => $marca_options,
+    '#default_value' => $marca_default_value,
+    '#ajax'  => array(
+      'callback' => 'novocar_search_search_form_marca_ajax_callback',
+      'wrapper'  => 'novocar-search-lite-search-modelo',
+      'effect'   => 'fade',
+      'progress' => array(
+        'type'    => 'throbber',
+        'message' => '',
+      ),
+    ),
+    '#prefix' => '<div class="first-column">',
+  );
+
+  # Modelo.
+  if ($marca == TRUE) {
+
+    $modelo_options  = array('-' => t('Cualquiera')) + novocar_general_get_terms_by_vid(NG_MODELO_VIC, $marca_default_value);
+    $modelo_disabled = FALSE;
+
+    if (!isset($form_state['values']['modelo']) && isset($_GET['modelo'])) {
+      
+      $modelo_default_value = $_GET['modelo'];
+    }
+    elseif (isset($form_state['values']['marca']) && $form_state['values']['marca'] != '-') {
+      $modelo_default_value = $form_state['values']['marca'];
+    }
+    else {
+      $modelo_default_value = '-';
+    }
+  }
+  else {
+    $modelo_default_value = '-';
+    $modelo_options       = array('-' => t('Cualquiera'));
+    $modelo_disabled      = TRUE;
+  }
+
+  $form['modelo'] = array(
+    '#title'         => t('Modelo'),
+    '#type'          => 'select',
+    '#options'       => $modelo_options,
+    '#default_value' => $modelo_default_value,
+    '#disabled'      => $modelo_disabled,
+    '#prefix'        => '<div id="novocar-search-lite-search-modelo">',
+    '#suffix'        => '</div>',
+  );
+
+  # Combustible.
+  $combustible_options = array('-' => t('Cualquiera')) + novocar_general_get_terms_by_vid(6);
+
+  $form['combustible'] = array(
+    '#title'         => t('Combustible'),
+    '#type'          => 'select',
+    '#options'       => $combustible_options,
+    '#default_value' => '-',
+    '#prefix'        => '<div id="novocar-search-lite-search-modelo">',
+    '#suffix'        => '</div></div>',
+  );
+
+  # Precio.
+  $form['prize'] = array(
+    '#type'   => 'container',
+    '#prefix' => '<div class="second-column">',
+  );
+
+  $form['prize']['prize_markup'] = array(
+    '#markup' => '<label>' . t('Precio') . '</label>',
+  );
+
+  ## Precio desde.
+  $prize_from_options = array('-' => t('Desde')) + novocar_general_generate_number_range_list(NG_RANGE_MIN, NG_RANGE_MAX, NG_RANGE_RANGE, ' €');
+
+  if (!isset($form_state['values']['prize_from']) && isset($_GET['prize_from']) && isset($prize_from_options[$_GET['prize_from']])) {
+    $prize_from_default_value = $_GET['prize_from'];
+    $prize_from = TRUE;
+  }
+  elseif (isset($form_state['values']['prize_from']) && $form_state['values']['prize_from'] != '-') {
+    $prize_from_default_value = $form_state['values']['prize_from'];
+    $prize_from = TRUE;
+  }
+  else {
+    $prize_from_default_value = '-';
+    $prize_from = FALSE;
+  }
+
+  array_pop($prize_from_options);
+
+
+  $form['prize']['prize_from'] = array(
+    '#title'         => t('Desde'),
+    '#type'          => 'select',
+    '#options'       => $prize_from_options,
+    '#default_value' => $prize_from_default_value,
+    '#ajax'  => array(
+      'callback' => 'novocar_search_search_form_prize_from_ajax_callback',
+      'wrapper'  => 'novocar-search-prize-to',
+      'effect'   => 'fade',
+      'progress' => array(
+        'type'    => 'throbber',
+        'message' => '',
+      ),
+    ),
+  );
+
+  ## Precio hasta.
+  if ($prize_from == TRUE) {
+    
+    $prize_to_disabled = FALSE;
+    $prize_to_options =  novocar_general_generate_number_range_list($prize_from_default_value + NG_RANGE_RANGE, NG_RANGE_MAX, NG_RANGE_RANGE, ' €');
+
+    if (!isset($form_state['values']['prize_to']) && isset($_GET['prize_to'])) {
+      $prize_to_default_value = $_GET['prize_to'];
+    }
+    elseif (isset($form_state['values']['prize_to']) && $form_state['values']['prize_to'] != '-' && $form_state['values']['prize_to'] > $form_state['values']['prize_from']) {
+      $prize_to_default_value = $form_state['values']['prize_to'];
+    }
+    else {
+      $prize_to_default_value = NULL;
+    }
+  }
+  else {
+    $modelo_default_value = '-';
+    $modelo_options       = array('-' => t('Cualquiera'));
+    $prize_to_disabled      = TRUE;
+    $prize_to_options =  array('-' => t('Hasta')) + novocar_general_generate_number_range_list(NG_RANGE_RANGE, NG_RANGE_MAX, NG_RANGE_RANGE, ' €');
+  }
+  
+
+  $form['prize']['prize_to'] = array(
+    '#title'         => t('Hasta'),
+    '#type'          => 'select',
+    '#options'       => $prize_to_options,
+    '#default_value' => $prize_to_disabled,
+    '#disabled'      => $prize_to_disabled,
+    '#prefix'        => '<div id="novocar-search-prize-to">',
+    '#suffix'        => '</div>',
+  );
+
+  # Kilómetros.
+  ## Kilómetros desde.
+  $form['km'] = array(
+    '#type' => 'container',
+  );
+
+  $form['km']['km_markup'] = array(
+    '#markup' => '<label>' . t('Kilómetros') . '</label>',
+  );
+
+  $km_from_options = array('-' => t('Desde')) + novocar_general_generate_number_range_list(NS_KM_START, NS_KM_END, NS_KM_RANGE, ' km');
+
+  array_pop($km_from_options);
+
+  if (!isset($form_state['values']['km_from']) && isset($_GET['km_from']) && isset($km_from_options[$_GET['km_from']])) {
+    $km_from_default_value = $_GET['km_from'];
+    $km_from = TRUE;
+  }
+  elseif (isset($form_state['values']['km_from']) && $form_state['values']['km_from'] != '-') {
+    $km_from_default_value = $form_state['values']['km_from'];
+    $km_from = TRUE;
+  }
+  else {
+    $km_from_default_value = '-';
+    $km_from = FALSE;
+  }
+
+  $form['km']['km_from'] = array(
+    '#title'         => t('Desde'),
+    '#type'          => 'select',
+    '#options'       => $km_from_options,
+    '#default_value' => $km_from_default_value,
+    '#ajax'  => array(
+      'callback' => 'novocar_search_search_form_km_from_ajax_callback',
+      'wrapper'  => 'novocar-search-km-to',
+      'effect'   => 'fade',
+      'progress' => array(
+        'type'    => 'throbber',
+        'message' => '',
+      ),
+    ),
+  );
+
+  ## Kilómetros hasta.
+  if ($km_from == TRUE) {
+    
+    $km_to_disabled = FALSE;
+    $km_to_options  =  novocar_general_generate_number_range_list($km_from_default_value + NS_KM_RANGE, NS_KM_END, NS_KM_RANGE, ' km');
+
+    if (!isset($form_state['values']['km_to']) && isset($_GET['km_to']) && isset($km_to_options[$_GET['km_to']])) {
+      $km_to_default_value = $_GET['km_to'];
+    }
+    elseif (isset($form_state['values']['km_to']) && $form_state['values']['km_to'] != '-' && $form_state['values']['km_to'] > $form_state['values']['km_to']) {
+      $km_to_default_value = $form_state['values']['km_to'];
+    }
+    else {
+      $km_to_default_value = NULL;
+    }
+  }
+  else {
+    $km_to_default_value = '-';
+    $km_to_disabled      = TRUE;
+    $km_to_options =  array('-' => t('Hasta')) + novocar_general_generate_number_range_list(NG_RANGE_RANGE, NG_RANGE_MAX, NG_RANGE_RANGE, ' km');
+  }
+
+  $form['km']['km_to'] = array(
+    '#title'         => t('Hasta'),
+    '#type'          => 'select',
+    '#options'       => $km_to_options,
+    '#default_value' => $km_to_default_value,
+    '#disabled'      => $km_to_disabled,
+    '#prefix'        => '<div id="novocar-search-km-to">',
+    '#suffix'        => '</div>',
+  );
+
+  # Año.
+  ## Año desde.
+  $form['year'] = array(
+    '#type'   => 'container',
+    '#suffix' => '</div>',
+  );
+
+  $form['year']['year_markup'] = array(
+    '#markup' => '<label>' . t('Año') . '</label>',
+  );
+
+  $year_from_options = array('-' => t('Desde')) + novocar_general_generate_number_range_list(NS_YEAR_START, NS_YEAR_END, NS_YEAR_RANGE);
+
+  array_pop($year_from_options);
+
+  if (!isset($form_state['values']['year_from']) && isset($_GET['year_from']) && isset($year_from_options[$_GET['year_from']])) {
+    $year_from_default_value = $_GET['km_from'];
+    $year_from = TRUE;
+  }
+  elseif (isset($form_state['values']['year_from']) && $form_state['values']['year_from'] != '-') {
+    $year_from_default_value = $form_state['values']['year_from'];
+    $year_from = TRUE;
+  }
+  else {
+    $year_from_default_value = '-';
+    $year_from = FALSE;
+  }
+
+  $form['year']['year_from'] = array(
+    '#title'         => t('Desde'),
+    '#type'          => 'select',
+    '#options'       => $year_from_options,
+    '#default_value' => $year_from_default_value,
+    '#ajax'  => array(
+      'callback' => 'novocar_search_search_form_year_from_ajax_callback',
+      'wrapper'  => 'novocar-search-year-to',
+      'effect'   => 'fade',
+      'progress' => array(
+        'type'    => 'throbber',
+        'message' => '',
+      ),
+    ),
+  );
+
+  ## Año hasta.
+  if ($year_from == TRUE) {
+    
+    $year_to_disabled = FALSE;
+    $year_to_options  =  novocar_general_generate_number_range_list($year_from_default_value + NS_YEAR_RANGE, NS_YEAR_END, NS_YEAR_RANGE);
+
+    if (!isset($form_state['values']['year_to']) && isset($_GET['year_to']) && isset($year_to_options[$_GET['year_to']])) {
+      $year_to_default_value = $_GET['year_to'];
+    }
+    elseif (isset($form_state['values']['year_to']) && $form_state['values']['year_to'] != '-' && $form_state['values']['year_to'] > $form_state['values']['year_from']) {
+      $year_to_default_value = $form_state['values']['year_to'];
+    }
+    else {
+      $year_to_default_value = NULL;
+    }
+  }
+  else {
+    $year_to_default_value = '-';
+    $year_to_disabled      = TRUE;
+    $year_to_options =  array('-' => t('Hasta')) + novocar_general_generate_number_range_list(NS_YEAR_START, NS_YEAR_END, NS_YEAR_RANGE);
+  }
+
+  $form['year']['year_to'] = array(
+    '#title'         => t('Hasta'),
+    '#type'          => 'select',
+    '#options'       => $year_to_options,
+    '#default_value' => $year_to_default_value,
+    '#disabled'      => $year_to_disabled,
+    '#prefix'        => '<div id="novocar-search-year-to">',
+    '#suffix'        => '</div>',
+  );
+
+  # Submit.
+  $form['search'] = array(
+    '#type'  => 'submit',
+    '#value' => t('Buscar mi coche'),
+    '#attributes' => array(
+      'class' => array(
+	'novocar-action',
+      ),
+    ),
+    '#ajax'  => array(
+      'callback' => 'novocar_search_search_form_search_ajax_callback',
+      'effect'   => 'fade',
+      'progress' => array(
+        'type'    => 'throbber',
+        'message' => '',
+      ),
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * @brief Función que genera el formulario de búsqueda versión "lite".
+ */
+function novocar_search_lite_search_form($form, &$form_state) {
+
+  $form = array();
+
+  $form['#prefix'] = '<div id="novocar-search-lite-search-form-wrapper">';
+  $form['#suffix'] = '</div>';
+
+  $marca_options = array('-' => t('Todas las marcas')) + novocar_general_get_terms_by_vid(NG_MODELO_VIC);
+
+  $form['marca'] = array(
+    '#title'         => t('Marca'),
+    '#type'          => 'select',
+    '#options'       => $marca_options,
+    '#default_value' => '-',
+    '#ajax'  => array(
+      'callback' => 'novocar_search_search_form_marca_ajax_callback',
+      'wrapper'  => 'novocar-search-lite-search-modelo',
+      'effect'   => 'fade',
+      'progress' => array(
+        'type'    => 'throbber',
+        'message' => '',
+      ),
+    ),
+  );
+
+  if (isset($form_state['values']['marca'])&& $form_state['values']['marca'] != '-') {
+    $modelo_options = array('-' => t('Cualquiera')) + novocar_general_get_terms_by_vid(NG_MODELO_VIC, $form_state['values']['marca']);
+    $disabled = FALSE;
+  }
+  else {
+    $modelo_options = array('-' => t('Cualquiera'));
+    $disabled = TRUE;
+  }
+
+  $form['modelo'] = array(
+    '#title'         => t('Modelo'),
+    '#type'          => 'select',
+    '#options'       => $modelo_options,
+    '#default_value' => isset($form_state['values']['modelo']) ? $form_state['values']['modelo'] : NULL,
+    '#disabled'      => $disabled,
+    '#prefix'        => '<div id="novocar-search-lite-search-modelo">',
+    '#suffix'        => '</div>',
+  );
+
+  $prize_from_options = array('-' => t('Desde')) + novocar_general_generate_number_range_list(NG_RANGE_MIN, NG_RANGE_MAX, NG_RANGE_RANGE, ' €');
+
+  $form['prize'] = array(
+    '#type' => 'container',
+  );
+
+  $form['prize']['prize_markup'] = array(
+    '#markup' => '<label>' . t('Precio') . '</label>',
+  );
+
+  $form['prize']['prize_from'] = array(
+    '#title'         => t('Desde'),
+    '#type'          => 'select',
+    '#options'       => $prize_from_options,
+    '#default_value' => '-',
+    '#ajax'  => array(
+      'callback' => 'novocar_search_search_form_prize_from_ajax_callback',
+      'wrapper'  => 'novocar-search-prize-to',
+      'effect'   => 'fade',
+      'progress' => array(
+        'type'    => 'throbber',
+        'message' => '',
+      ),
+    ),
+  );
+
+  if (isset($form_state['values']['prize_from']) && $form_state['values']['prize_from'] != '-') {
+    $prize_to_options = novocar_general_generate_number_range_list(NG_RANGE_RANGE + $form_state['values']['prize_from'], NG_RANGE_MAX, NG_RANGE_RANGE, ' €');
+    $disabled   = FALSE;
+
+    if (isset($form_state['values']['prize_to']) && ($form_state['values']['prize_to'] != '-' || $form_state['values']['prize_to'] > $form_state['values']['prize_from'])) {
+      $default_value = $form_state['values']['prize_to'];
+    }
+    else {
+      $default_value = $form_state['values']['prize_to'] + NG_RANGE_RANGE;
+    }
+  }
+  else {
+    $to_options = novocar_general_generate_number_range_list(NG_RANGE_RANGE, NG_RANGE_MAX, NG_RANGE_RANGE, ' €');
+    $disabled   = TRUE;
+    $default_value = '-';
+    $prize_to_options = array('-' => t('Hasta')) + $to_options;
+  }
+
+  $form['prize']['prize_to'] = array(
+    '#title'         => t('Hasta'),
+    '#type'          => 'select',
+    '#options'       => $prize_to_options,
+    '#default_value' => $default_value,
+    '#disabled'      => $disabled,
+    '#prefix'        => '<div id="novocar-search-prize-to">',
+    '#suffix'        => '</div>',
+  );
+
+  $form['faceted_text'] = array(
+    '#markup' => l(t('No lo tengo claro, prefiero que me ayudes'), 'node/1'),
+  );
+
+  $form['search'] = array(
+    '#type'  => 'submit',
+    '#value' => t('Buscar mi coche'),
+    '#attributes' => array(
+      'class' => array(
+	'novocar-action',
+      ),
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * @brief Función de submit del formulario "novocar_search_lite_search_form".
+ */
+function novocar_search_lite_search_form_submit(&$form, $form_state) {
+
+  $query = array();
+
+  if (isset($form_state['values']['marca']) && $form_state['values']['marca'] != '-') {
+    $query['marca'] = $form_state['values']['marca'];
+  }
+
+  if (isset($form_state['values']['modelo']) && $form_state['values']['modelo'] != '-' && $form_state['values']['modelo'] != NULL) {
+    $query['modelo'] = $form_state['values']['modelo'];
+  }
+
+  if (isset($form_state['values']['prize_from']) && $form_state['values']['prize_from'] != '-') {
+    $query['prize_from'] = $form_state['values']['prize_from'];
+  }
+
+  if (isset($form_state['values']['prize_to']) && $form_state['values']['prize_to'] != '-') {
+    $query['prize_to'] = $form_state['values']['prize_to'];
+  }
+
+  drupal_goto(NS_URL_SEARCH, array('query' => $query));
+}
+
+/**
+ * @brief Ajax callback para el campo "Marca" del formulario.
+ */
+function novocar_search_search_form_marca_ajax_callback(&$form, &$form_state) {
+
+  return $form['modelo'];
+}
+
+/**
+ * @brief Ajax callback para el campo "Precio" del formulario.
+ */
+function novocar_search_search_form_prize_from_ajax_callback(&$form, &$form_state) {
+
+  return $form['prize']['prize_to'];
+
+  if (isset($form_state['values']['prize_from'])) {
+    if ($form_state['values']['prize_from'] == '-') {
+      $prize_to_options = array('-' => t('Hasta')) + novocar_general_generate_number_range_list(NG_RANGE_RANGE, NG_RANGE_MAX, NG_RANGE_RANGE, ' €');
+      $default_value = '-';
+      $attributes = array(
+	'disabled' => 'disabled',
+      );
+    }
+    else {
+      $prize_to_options = novocar_general_generate_number_range_list(NG_RANGE_RANGE + $form_state['values']['prize_from'], NG_RANGE_MAX, NG_RANGE_RANGE, ' €');
+      $default_value = $form_state['values']['prize_to'] + NG_RANGE_RANGE;
+      $attributes = array();
+    }
+
+    $prize_to = array(
+      '#title'         => t('Hasta'),
+      '#type'          => 'select',
+      '#options'       => $prize_to_options,
+      '#default_value' => $default_value,
+      '#prefix'        => '<div id="novocar-search-prize-to">',
+      '#suffix'        => '</div>',
+      '#attributes'    => $attributes,
+    );
+
+    return render($prize_to);
+  }
+
+  return render($form['prize_to']);
+}
+
+/**
+ * @brief Ajax callback para el campo "Kilómetros" del formulario.
+ */
+function novocar_search_search_form_km_from_ajax_callback(&$form, &$form_state) {
+
+  return $form['km']['km_to'];
+}
+
+/**
+ * @brief Ajax callback para el campo "Año" del formulario.
+ */
+function novocar_search_search_form_year_from_ajax_callback(&$form, &$form_state) {
+
+  return $form['year']['year_to'];
+
+  if (isset($form_state['values']['year_from'])) {
+    if ($form_state['values']['year_from'] == '-') {
+      $year_to_options = array('-' => t('Hasta')) + novocar_general_generate_number_range_list(NS_YEAR_START, NS_YEAR_END, NS_YEAR_RANGE);
+      $default_value = '-';
+      $attributes = array(
+	'disabled' => 'disabled',
+      );
+    }
+    else {
+      $year_to_options = novocar_general_generate_number_range_list(NS_YEAR_RANGE + $form_state['values']['year_from'], NS_YEAR_END, NS_YEAR_RANGE);
+      $default_value = $form_state['values']['year_from'] + NS_YEAR_RANGE;
+      $attributes = array();
+    }
+
+    $year_to = array(
+      '#title'         => t('Hasta'),
+      '#type'          => 'select',
+      '#options'       => $year_to_options,
+      '#default_value' => $form_state['values']['year_to'],
+      '#prefix'        => '<div id="novocar-search-year-to">',
+      '#suffix'        => '</div>',
+      '#attributes'    => $attributes,
+    );
+
+    return render($year_to);
+  }
+
+  return render($form['year_to']);
+}
+
+/**
+ * @brief Ajax callback para el campo "submit" del formulario.
+ */
+function novocar_search_search_form_search_ajax_callback(&$form, &$form_state) {
+//   sleep(50);
+  # Resultados.
+  ## Modelo.
+  $commands = array();
+
+  $commands[] = ajax_command_invoke('', 'novocar_search_submit');
+
+  $modelo_arguments = array();
+
+  if (isset($form_state['values']['marca']) && $form_state['values']['marca'] != '-') {
+    $modelo_arguments[] = $form_state['values']['marca'];
+  }
+
+  if (isset($form_state['values']['modelo']) && $form_state['values']['modelo'] != '-') {
+    $modelo_arguments[] = $form_state['values']['modelo'];
+  }
+
+  if (isset($form_state['values']['combustible']) && $form_state['values']['combustible'] != '-') {
+    $modelo_arguments[] = $form_state['values']['combustible'];
+  }
+
+  $modelo = (count($modelo_arguments) > 0) ? implode(',', $modelo_arguments) : 'all';
+
+  ## Precio.
+  $price_arguments = array();
+
+  if (isset($form_state['values']['prize_from']) && $form_state['values']['prize_from'] != '-' && isset($form_state['values']['prize_to']) && $form_state['values']['prize_to'] != '-') {
+    $price_arguments = novocar_general_get_term_between_min_max($form_state['values']['prize_from'], $form_state['values']['prize_to'], NG_PRECIO_VIC);
+  }
+
+  $price  = (count($price_arguments) > 0) ? implode('+', $price_arguments) : 'all';
+
+  ## Kilómetros.
+  $km_arguments = array();
+
+  if (isset($form_state['values']['km_from']) && $form_state['values']['km_from'] != '-' && isset($form_state['values']['km_to']) && $form_state['values']['km_to'] != '-') {
+    $km_arguments = novocar_general_get_term_between_min_max($form_state['values']['km_from'], $form_state['values']['km_to'], NG_KM_VIC);
+  }
+
+  $km  = (count($km_arguments) > 0) ? implode('+', $km_arguments) : 'all';
+
+  ## Año.
+  $year_arguments = array();
+
+  if (isset($form_state['values']['year_from']) && $form_state['values']['year_from'] != '-' && isset($form_state['values']['year_to']) && $form_state['values']['year_to'] != '-') {
+    $year_arguments = novocar_general_get_term_between_min_max($form_state['values']['year_from'], $form_state['values']['year_to'], NG_YEAR_VIC);
+  }
+
+  $year  = (count($year_arguments) > 0) ? implode('+', $year_arguments) : 'all';
+
+  $output = '<div id="novocar-search-search-results">' . views_embed_view('novocar_search_result', 'default', $modelo, $price, $km, $year) . '</div>';
+
+  $commands[] = ajax_command_replace('#novocar-search-search-results', $output);
+
+  return array('#type' => 'ajax', '#commands' => $commands);
+}

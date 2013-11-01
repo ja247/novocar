@@ -1,0 +1,38 @@
+/**
+ *  @file novocar_contact.css
+ */
+
+.field #novocar-contact-form-popup,
+#colorbox #novocar-contact-form-loading
+{
+  display: none;
+}
+
+.progress-disabled {
+  float: none;
+  display:inline;
+}
+
+.ajax-progress {
+  float: none;
+  display:block;
+}
+.ajax-progress .throbber {
+  background: transparent url('../../novocar_general/images/ajax-loader.gif') no-repeat;
+  float: none;
+  height: 31px;
+  margin: 2px;
+  width: 31px;
+  display: block;
+  position: absolute;
+  top: 0;
+  margin: auto;
+  left: 42%;
+  top: 42%;
+}
+tr .ajax-progress .throbber {
+  margin: 0 2px;
+}
+.ajax-progress-bar {
+  width: 16em;
+}

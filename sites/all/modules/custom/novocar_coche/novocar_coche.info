@@ -1,0 +1,7 @@
+name = Novocar Coche
+description = Módulo que añade las funcionalidades necesarias para el producto "coche".
+package = Novocar
+core = 7.x
+
+
+dependencies[] = novocar_general

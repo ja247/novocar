@@ -1,0 +1,6 @@
+name = Novocar Simplenews
+description = Funcionalidades relacionadas con la suscripción de usuarios.
+package = Novocar
+core = 7.x
+
+dependencies[] = novocar_general

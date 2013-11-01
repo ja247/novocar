@@ -1,0 +1,331 @@
+<?php
+/**
+ * @file  novocar_general.module
+ *
+ * @brief Funcionalides generales y comunes del sitio Novocar.
+ */
+
+# Strings por defecto.
+## Política de privacidad.
+define('NG_PP_1', 'Acepto la <a href="/politica-privacidad">política de privacidad</a>');
+
+# Vocabularios
+## Vocabulario "modelo".
+define('NG_MODELO_VIC', 3);
+## Vocabulario "año".
+define('NG_YEAR_VIC', 5);
+## Vocabulario "precio".
+define('NG_PRECIO_VIC', 8);
+## Vocabulario "kilómetros".
+define('NG_KM_VIC', 9);
+
+# Otros
+##Formato por defecto.
+define('NC_FORMAT', 'full_html');
+## Rangos de números
+### Cantidad mínima por defecto.
+define('NG_RANGE_MIN', 0);
+### Cantidad máxima por defecto.
+define('NG_RANGE_MAX', 20000);
+### Rango a aumentar entre números.
+define('NG_RANGE_RANGE', 2000);
+
+# Tipos de contenido por defecto.
+## Coche.
+define('NG_CTYPE_COCHE', 'coche');
+
+# Tamaños por defecto.
+## Ancho por defecto de los videos.
+define('NG_VIDEO_WIDTH', 600);
+## Alto por defecto de los videos.
+define('NG_VIDEO_HEIGHT', 320);
+
+/**
+ * Implements hook_menu().
+ */
+function novocar_general_menu() {
+
+  $items = array();
+
+  $items['inicio'] = array(
+    'title'            => 'Inicio',
+    'access arguments' => array('access content'),
+    'page callback'    => 'novocar_general_front_callback',
+    'weight'           => 9,
+    'file'             => 'inc/novocar_general.pages.inc',
+  );
+
+  $items['admin/novocar'] = array(
+    'title'            => 'Novocar',
+    'access arguments' => array('access administration pages'),
+    'page callback'    => 'system_admin_menu_block_page',
+    'weight'           => 9,
+    'file'             => 'system.admin.inc',
+    'file path'        => drupal_get_path('module', 'system'),
+  );
+
+  return $items;
+}
+
+/**
+ * @brief Función que recibe un nid y devuelve su title.
+ *
+ * @param nid
+ *     Identificador del nodo.
+ *
+ * @return string
+ */
+function novocar_general_get_node_title_by_nid($nid) {
+
+  $title = db_query("SELECT title FROM {node} WHERE nid = :nid", array(':nid' => $nid))->fetchField();
+
+  return $title;
+}
+
+/**
+ * @brief Función que recibe un texto y los tokens para ser reemplazados.
+ *
+ * @param text
+ *     Texto sobre el que reemplazar las cadenas.
+ * @param replace
+ *     Array contenedor de los tokens a reemplazar.
+ *
+ * @return html
+ */
+function novocar_general_text_tokens_replace($text, $replace) {
+
+  $search = array_keys($replace);
+
+  return str_replace($search, $replace, $text);
+}
+
+/**
+ * @brief Función que recibe un listado de emails en formato string y lo devuelve en formato array.
+ *
+ * @param emails
+ *     Listado de emails a procesar.
+ * @param separator
+ *     Separador del listado. "," por defecto.
+ *
+ * @return array
+ */
+function novocar_general_process_mail_string($mails, $separator = ',') {
+  return explode($separator, $mails);
+}
+
+/**
+ * @brief Función que recibe un vid y devuelve sus términos en formato "#options".
+ *
+ * @param vid
+ *     Integer. Identificador del vocabulario.
+ *
+ * @return array.
+ */
+function novocar_general_get_terms_by_vid($vid, $parent = 0) {
+
+  $options = array();
+
+  $query = db_query("SELECT taxonomy_term_data.name, taxonomy_term_data.tid FROM {taxonomy_term_data} LEFT JOIN taxonomy_term_hierarchy ON taxonomy_term_hierarchy.tid = taxonomy_term_data.tid WHERE taxonomy_term_data.vid = :vid AND taxonomy_term_hierarchy.parent = :parent", array(':vid' => $vid, ':parent' => $parent));
+
+  foreach ($query as $row) {
+    $options[$row->tid] = ($row->name);
+  }
+
+  return $options;
+}
+
+/**
+ * @brief Función que devuelve los términos para un determinado vocabulario optimizados para opciones de formularios.
+ *
+ * @param vid
+ *     Identificador único del vocabulario.
+ * @param depth
+ *     Integer. Profundidad a devolver.
+ */
+function novocar_general_taxonomy_get_tree($vid, $depth) {
+
+  $terms = taxonomy_get_tree($vid, 0, 1);
+
+  $options = array();
+
+  foreach ($terms as $term) {
+    $options[$term->tid] = $term->name;
+  }
+
+  return $options;
+}
+
+/**
+ * @brief Función que devuelve los términos para un determinado vocabulario optimizados para opciones de formularios.
+ *
+ * @param tid
+ *     Identificador único del vocabulario.
+ */
+function novocar_general_taxonomy_get_term_children($tid) {
+
+  $terms = taxonomy_get_children($tid);
+
+  $options = array();
+
+  foreach ($terms as $term) {
+    $options[$term->tid] = $term->name;
+  }
+
+  return $options;
+}
+
+/**
+ * @brief Función que genera los listados de precios.
+ *
+ * @param start
+ *     Integer, cantidad con la que iniciar.
+ * @param end
+ *     Integer, cantidad en la que finalizar.
+ * @param range
+ *     Integer, cantidad a sumar entre una cantidad y la siguiente.
+ */
+function novocar_general_generate_number_range_list($start = NG_RANGE_MIN, $end = NG_RANGE_MAX, $range = NG_RANGE_RANGE, $suffix = NULL) {
+
+  $options = array();
+
+  while ($start <= $end) {
+    $options[$start] = $start . $suffix;
+    $start += $range;
+  }
+
+  return $options;
+}
+
+/**
+ * @brief Función que recibe un "value" y un "vid" y devuelve el término al que pertenece el valor.
+ *
+ * @param value
+ *     Integer. Valor para buscar entre el rango.
+ * @param vid
+ *     Integer. Identificador del vocabulario sobre el que buscar.
+ *
+ * @return integer.
+ */
+function novocar_general_get_term_between($value, $vid) {
+
+  $tid = db_query("SELECT taxonomy_term_data.tid
+                   FROM {taxonomy_term_data}
+                   LEFT JOIN field_data_field_minimo ON field_data_field_minimo.entity_id = taxonomy_term_data.tid
+                   LEFT JOIN field_data_field_maximo ON field_data_field_maximo.entity_id = taxonomy_term_data.tid
+                   WHERE field_data_field_minimo.field_minimo_value < :value
+                   AND field_data_field_maximo.field_maximo_value >= :value
+                   AND field_data_field_minimo.entity_type = 'taxonomy_term'
+                   AND field_data_field_maximo.entity_type = 'taxonomy_term'
+                   AND taxonomy_term_data.vid = :vid",
+                   array(':value' => $value, ':vid' => $vid))->fetchField();
+
+  return $tid;
+}
+
+/**
+ * @brief Función que recibe un valor mínimo, máximo y un "vid" y devuelve los término entre los que se encuentre.
+ *
+ * @param min
+ *     Integer. Valor mínimo desde el que buscar.
+ * @param max
+ *     Integer. Valor máximo desde el que buscar.
+ * @param vid
+ *     Integer. Identificador del vocabulario sobre el que buscar.
+ *
+ * @return integer.
+ */
+function novocar_general_get_term_between_min_max($min, $max, $vid) {
+
+  $query = db_query("SELECT taxonomy_term_data.tid
+                   FROM {taxonomy_term_data}
+                   LEFT JOIN field_data_field_minimo ON field_data_field_minimo.entity_id = taxonomy_term_data.tid
+                   LEFT JOIN field_data_field_maximo ON field_data_field_maximo.entity_id = taxonomy_term_data.tid
+                   WHERE field_data_field_minimo.field_minimo_value >= :min
+                   AND field_data_field_maximo.field_maximo_value <= :max
+                   AND field_data_field_minimo.entity_type = 'taxonomy_term'
+                   AND field_data_field_maximo.entity_type = 'taxonomy_term'
+                   AND taxonomy_term_data.vid = :vid
+                   ORDER BY taxonomy_term_data.tid ASC",
+                   array(':min' => $min, ':max' => $max, ':vid' => $vid));
+
+  $tids = array();
+
+  foreach ($query as $row) {
+    $tids[] = $row->tid;
+  }
+
+  return $tids;
+}
+
+/**
+ * @brief Función que recibe una url de Youtube, y devuelve su id.
+ *
+ * @param youtube_url
+ *     URL del video de Youtube.
+ *
+ * @return mixed Youtube video ID or FALSE if not found.
+ */
+function novocar_general_get_youtube_id_from_url($youtube_url) {
+
+    $parts = parse_url($youtube_url);
+
+    if (isset($parts['query'])) {
+
+      parse_str($parts['query'], $qs);
+
+      if(isset($qs['v'])){
+
+	return $qs['v'];
+      }
+      elseif($qs['vi']) {
+
+	return $qs['vi'];
+      }
+    }
+
+    if (isset($parts['path'])) {
+
+      $path = explode('/', trim($parts['path'], '/'));
+
+      return $path[count($path)-1];
+    }
+
+    return FALSE;
+}
+
+/**
+ * @brief Función que recibe un video de Youtube, y devuelve el videon en formato embed.
+ *
+ * @param youtube_url
+ *     URL del video de Youtube.
+ * @param width
+ *     Ancho del video.
+ * @param height
+ *     Alto del video.
+ *
+ * @return string.
+ */
+function novocar_general_get_embed_from_youtube_url($youtube_url, $width = NG_VIDEO_WIDTH, $height = NG_VIDEO_HEIGHT) {
+
+  $youtube_id = novocar_general_get_youtube_id_from_url($youtube_url);
+
+  return '<iframe wmode="opaque" width="' . $width . '" height="' . $height . '" src="http://www.youtube.com/embed/' . $youtube_id . '?wmode=opaque" frameborder="0" allowfullscreen></iframe>';
+}
+
+/**
+ * @brief Función que recibe un video de Youtube, y devuelve su thumbnail.
+ *
+ * @param youtube_url
+ *     URL del video de Youtube.
+ * @param type
+ *     Tipo de thumbnail a devolver.
+ *
+ * @return string.
+ */
+function novocar_general_get_thumbnail_from_youtube_url($youtube_url, $type = 'hqdefault') {
+
+  $youtube_id = novocar_general_get_youtube_id_from_url($youtube_url);
+
+  return 'http://i1.ytimg.com/vi/' .$youtube_id . '/' . $type . '.jpg';
+}
+ 

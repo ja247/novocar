@@ -1,0 +1,393 @@
+<?php
+/**
+ * @file  novocar_contact.module
+ *
+ * @brief Módulo que añade la funcionalidad de contacto específico para Novocar.
+ */
+
+# Variables por defecto.,
+## Mails por defecto.
+define('NC_MAILS', 'sof.jotha1@gmail.com, csanchezrubio@gmail.com');
+## Gracias por contactar,
+### Contenido,
+define('NC_THANKS_CONTENT', '<p style="margin: 0;">¡Gracias por contactar con Novocar!</p>');
+## Mail de contacto,
+### Asunto del mail,
+define('NC_MAIL_SUBJECT', 'Nueva solicitud de información');
+### Asunto del mail,
+define('NC_MAIL_CONTENT', '<p>Se ha recibido un nueva solicitud de información</p><p><strong>Datos del usuario:</strong></p><p><label>Nombre:</label> %nombre</p><p><label>Página de contacto:</label> %enlace</p><p><label>Teléfono:</label> %telefono</p><p><label>Correo electrónico:</label> %email</p><p><label>Contenido:</label> %contenido</p>');
+
+
+/**
+ * Implements hook_menu().
+ */
+function novocar_contact_menu() {
+
+  $items = array();
+
+  $items['admin/novocar/contact'] = array(
+    'title'            => 'Configuración del contacto',
+    'access arguments' => array('admin novocar_contact'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('novocar_contact_settings_form'),
+    'weight'           => 9,
+    'file'             => 'inc/novocar_contact.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function novocar_contact_theme() {
+
+  $themes = array(
+    'novocar_contact_form' => array(
+      'template'  => 'novocar-contact-form',
+      'path'      => drupal_get_path('module', 'novocar_contact') . '/theme',
+      'variables' => array(
+	'node' => NULL,
+      ),
+    ),
+  );
+
+  return $themes;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function novocar_contact_permission() {
+  return array(
+    'admin novocar_contact' => array(
+      'title'       => t('Administrar novocar_contact'),
+      'description' => t('Permite administrar el módulo de contacto.'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_ds_fields_info().
+ */
+function novocar_contact_ds_fields_info($entity_type) {
+
+  $fields = array();
+
+  $fields['node']['novocar_contact'] = array(
+    'title'      => t('Novocar contacto: Solicitar prueba'),
+    'field_type' => DS_FIELD_TYPE_FUNCTION,
+    'function'   => 'novocar_contact_field_callback',
+  );
+
+  if (isset($fields[$entity_type])) {
+    return array($entity_type => $fields[$entity_type]);
+  }
+  return;
+}
+
+/**
+ * Implements hook_mail().
+ */
+function novocar_contact_mail($key, &$message, $params) {
+
+  switch ($key) {
+    case 'notify':
+
+      $replace = array(
+	'%nombre'    => $params['record']['name'],
+	'%enlace'    => l(novocar_general_get_node_title_by_nid($params['record']['nid']), 'node/' . $params['record']['nid']),
+	'%telefono'  => $params['record']['phone'],
+	'%email'     => $params['record']['mail'],
+	'%contenido' => $params['record']['contenido'],
+      );
+
+      $content = variable_get('novocar_contact_mail_content', array('value' => NC_MAIL_CONTENT, 'format' => NC_FORMAT));
+
+      $message['subject'] = variable_get('novocar_contact_mail_subject', NC_MAIL_SUBJECT);
+      $message['body'][]  = check_markup(novocar_general_text_tokens_replace($content['value'], $replace), $content['format']);
+    break;
+  }
+}
+
+/**
+ * @brief Callback del campo "Contact me".
+ *
+ * @param field
+ */
+function novocar_contact_field_callback($field) {
+
+  # Añadimos el JS necesario.
+  drupal_add_js(drupal_get_path('module', 'novocar_contact') . '/js/novocar_contact.js');
+
+  # Añadimos el estilo básico.
+  drupal_add_css(drupal_get_path('module', 'novocar_contact') . '/css/novocar_contact.css');
+
+  $node = $field['entity'];
+
+  return theme('novocar_contact_form', array('node' => $node));
+}
+
+/**
+ * @brief Función que genera el formulario de contacto del módulo.
+ *
+ * @param form_state
+ * @param node
+ *     Nodo sobre el que se solicita contacto/información. También puede ser el nid del nodo.
+ */
+function novocar_contacto_contact_form($form, $form_state, $node) {
+
+  global $user;
+
+  $form = array();
+
+  $form['ip'] = array(
+    '#type'   => 'value',
+    '#value'  => $user->hostname,
+  );
+
+  $form['nid'] = array(
+    '#type'   => 'value',
+    '#value'  => (is_object($node)) ? $node->nid : $node,
+  );
+
+  $form['status'] = array(
+    '#type'   => 'value',
+    '#value'  => 0,
+  );
+
+  $form['name'] = array(
+    '#type'   => 'textfield',
+    '#title'  => t('Name'),
+    '#prefix' => '<div class="field-wrapper field-name-wrapper">',
+    '#suffix' => '<div class="field-error"></div></div>',
+  );
+
+  $form['phone'] = array(
+    '#type'   => 'textfield',
+    '#title'  => t('Phone'),
+    '#prefix' => '<div class="field-wrapper field-phone-wrapper">',
+    '#suffix' => '<div class="field-error"></div></div>',
+  );
+
+  $form['mail'] = array(
+    '#type'   => 'textfield',
+    '#title'  => t('Mail'),
+    '#prefix' => '<div class="field-wrapper field-mail-wrapper">',
+    '#suffix' => '<div class="field-error"></div></div>',
+  );  
+  
+  $form['contenido'] = array(
+    '#type'   => 'textarea',
+    '#title'  => 'Mensaje',
+    '#prefix' => '<div class="field-wrapper field-contenido-wrapper">',
+    '#suffix' => '<div class="field-error"></div></div>',
+  );
+
+  $form['contact_me'] = array(
+    '#type'  => 'submit',
+    '#value' => t('Contact me!'),
+    '#ajax'  => array(
+      'callback' => 'novocar_contact_form_ajax_callback',
+      'effect'   => 'fade',
+      'progress' => array(
+        'type'    => 'throbber',
+        'message' => variable_get('novocar_contact_throbber_message', 'Enviando correo..'),
+      ),
+    ),
+    '#prefix' => '<div class="field-wrapper field-submit-wrapper">',
+    '#suffix' => '</div>',
+    '#attributes' => array(
+      'onclick' => 'novocar()',
+    ),
+  );
+
+  return $form;
+}
+
+/**
+ * @brief Función de validación del formulario "novocar_contacto_contact_form".
+ */
+function novocar_contacto_contact_form_validate(&$form, &$form_state) {
+
+  drupal_add_js('jQuery(document).ready(function () { alert("Hello!"); });',
+    array('type' => 'inline', 'scope' => 'footer', 'weight' => 5)
+  );
+
+  $form_state['error'] = array();
+
+  if (empty($form_state['values']['name'])) {
+
+    $form_state['error'][] = array(
+      'class'   => 'field-name-wrapper',
+      'message' => t('Debes introducir tu nombre.'),
+    );
+  }
+
+  if (!valid_email_address($form_state['values']['mail'])) {
+
+    $form_state['error'][] = array(
+      'class'   => 'field-mail-wrapper',
+      'message' => t('El email introducido no es válido.'),
+    );
+  }
+
+  if (empty($form_state['values']['contenido'])) {
+
+    $form_state['error'][] = array(
+      'class'   => 'field-contenido-wrapper',
+      'message' => t('Introduce un mensaje'),
+    );
+  }
+}
+
+/**
+ * @brief Función de submit del formulario "novocar_contacto_contact_form".
+ */
+function novocar_contacto_contact_form_submit(&$form, &$form_state) {
+
+  # Si el formulario no ha dado errores..
+  if (is_array($form_state['error']) && count($form_state['error']) == 0) {
+    # Guardamos los valores en su tabla correspondiente.
+    $record = array(
+      'nid'       => $form_state['values']['nid'],
+      'status'    => 0,
+      'created'   => time(),
+      'name'      => $form_state['values']['name'],
+      'phone'     => $form_state['values']['phone'],
+      'mail'      => $form_state['values']['mail'],
+      'contenido' => $form_state['values']['contenido'],
+      'ip'        => $form_state['values']['ip'],
+    );
+
+    drupal_write_record('novocar_contact', $record);
+
+    # Enviamos las notificaciones.
+    $emails = novocar_general_process_mail_string(variable_get('novocar_contact_mail_emails', NC_MAILS));
+
+    if (is_array($emails) && count($emails) > 0) {
+
+      global $language;
+
+      foreach ($emails as $to) {
+	drupal_mail('novocar_contact', 'notify', $to, $language, array('record' => $record));
+      }
+    }
+  }
+}
+
+/**
+ * @brief AJAX callback para del formulario "novocar_contact_contact_form".
+ */
+function novocar_contact_form_ajax_callback($form, &$form_state) {
+
+  $commands[] = ajax_command_html('.field-error', NULL);
+
+  if (is_array($form_state['error']) && count($form_state['error']) > 0) {
+
+    foreach ($form_state['error'] as $error) {
+     $commands[] = ajax_command_html('.' . $error['class'] . ' .field-error', $error['message']);
+    }
+
+    $commands[] = ajax_command_invoke('', 'novocar_contact_resize');
+
+    $form_state['rebuild'] = TRUE;
+  }
+  else {
+
+    $commands[] = ajax_command_invoke('', 'novocar_contact_process');
+
+    $commands[] = ajax_command_invoke('', 'novocar_contact_resize');
+
+    $commands[] = ajax_command_invoke('', 'novocar_contact_close');
+
+    $commands[] = ajax_command_invoke('', 'novocar_contact_restore');
+  }
+
+  return array('#type' => 'ajax', '#commands' => $commands);
+}
+
+/**
+ * Implements template_preprocess_novocar_contact_form().
+ */
+function template_preprocess_novocar_contact_form(&$vars) {
+
+  $node = $vars['node'];
+
+  # Link que lanza el popup.
+  $vars['link'] = l(t('Solicitar prueba'), '', array('fragment' => 'novocar-contact-form-popup', 'query' => array('width' => 400, 'height' => 280, 'inline' => TRUE), 'attributes' => array('class' => 'colorbox-inline novocar-action')));
+
+  # Formulario de contacto.
+  $vars['contact_form'] = drupal_get_form('novocar_contacto_contact_form', $node);
+
+  # Imagen de carga en ajax.
+  $vars['loading'] = theme('image', array('path' => drupal_get_path('module', 'novocar_general') . '/images/ajax-loader.gif'));
+
+  # Thankyou.
+  $thankyou = variable_get('novocar_contact_thankyou', array('value' => NC_THANKS_CONTENT, 'format' => NC_FORMAT));
+
+  $vars['thankyou'] = check_markup($thankyou['value'], $thankyou['format']);
+}
+
+
+function dropdown($form, &$form_state, $no_js_use = FALSE) {
+   $form['field_name'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Field Name:  String, Woodwind, Brass, Percussion'),
+      '#required' => TRUE, 
+    );    
+
+   $field_val = isset($form_state['values']['field_name']) ? $form_state['values']['field_name'] : '';
+
+  $form['add_to_dropdown'] = array(
+      '#type' => 'button',
+      '#value' => 'Add To Dropdown',      
+     '#ajax' => array(      
+      'event' => 'click',
+      'callback' => 'dropdown_callback',
+      'wrapper' => 'dropdown-second-replace',
+    ),
+    );  
+
+  $form['dropdown_second'] = array(
+    '#type' => 'select',
+    '#title' => 'Dynamic Dropdown',    
+    '#prefix' => '<div id="dropdown-second-replace">',
+    '#suffix' => '</div>',    
+    '#options' => get_dropdown_options($field_val),
+    '#default_value' => isset($form_state['values']['dropdown_second']) ? $form_state['values']['dropdown_second'] : '',
+  );  
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+    '#prefix' => '<br><br><div id="submit_btn">',
+    '#suffix' => '</div>',
+    );
+    return $form;
+}
+
+function dropdown_callback($form, $form_state) {     
+
+    dpm($form);
+    dpm($form_state);
+   
+    return $form['dropdown_second'];
+}
+
+function get_dropdown_options($key = '') {
+  $options = array(
+    t($key) => drupal_map_assoc(array(t($key))),    
+  );
+  if (isset($options[$key])) {
+    return $options[$key];
+  }
+  else {
+    return array();
+  }
+}
+
+function dropdown_submit($form, &$form_state) {
+  //print_r($form_state['values']); exit();  
+  dpm($form_state, 'fste');
+}

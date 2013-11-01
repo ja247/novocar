@@ -1,0 +1,244 @@
+<?php
+/**
+ * @file  novocar_coche.module 
+ * 
+ * @brief Módulo que añade las funcionalidades necesarias para el producto "coche".
+ */
+
+# Variables de sistema.
+## "novocar_coche_new_search".
+define('NC_FP_NEW_SEARCH', '<p><a href="/es/buscar-coche"><img src="/sites/all/themes/custom/novocar/images/general/lupa-buscar.png" /></p><p class="button"></a><a class="novocar-action-back" href="/es/buscar-coche">Seguir buscando</a></p>
+');
+## "novocar_coche_general_info".
+define('NC_FP_GENERAL_INFO', '<p>Nuestros automóviles se rigen bajo el certificado de calidad UENOR UNE EN ISO 9001:2008 desde 1999, en nuestras divisiones tanto de ventas como de post-venta. Este certificado está expedido por la prestigiosa consultora Aenor, siendo una de las primeras empresas del sector en contador con tan alta acreditación de calidad.</p><p>15 días de prueba con posibilidad de cambio de vehículo. <a href="/falta-enlace">Más información</a>.</p><p>Servicio gratuito de vehículo de sustitución. <a href="/falta-enlace">Más información</a>.</p><p>Cogemos como parte de pago su coche actual. Siempre podrá realizar una prueba dinámica del vehículo que desea comprar.</p><p>Financiamos el vehículo al momento y con las mejores condiciones del mercado.</p><p>Las fotos son totalmente reales y se corresponden con el vehículo que podrán ver físicamente en nuestras instalaciones, así como precio, extras, módulo y kilómetros, salvo "error tipográfico o de transcripción" eximiento a la compañia de toda responsabilidad física o comercial derivada de estos errores ante cualquier reclamación posterior. Para una información más amplia y exacta, preguntar a nuestro personal especializado.</p>');
+
+/**
+ * Implements hook_menu().
+ */
+function novocar_coche_menu() {
+
+  $items = array();
+
+  $items['admin/novocar/coche'] = array(
+    'title'            => 'Configuración de producto coche',
+    'access arguments' => array('admin novocar_coche'),
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('novocar_coche_settings_form'),
+    'weight'           => 9,
+    'file'             => 'inc/novocar_coche.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_permission().
+ */
+function novocar_coche_permission() {
+  return array(
+    'admin novocar_coche' => array(
+      'title'       => t('Administrar novocar_coche'),
+      'description' => t('Permite administrar el módulo de coche.'),
+    ),
+  );
+}
+
+/**
+* Implements hook_field_formatter_info().
+*/
+function novocar_coche_field_formatter_info() {
+  $info = array(
+    'media' => array(
+      'label' => t('Video/imagen renderizado'), 
+      'field types' => array('file'),
+      'description' => t('Muestra el video o la imagen renderizados'),
+    ), 
+    'media_thumbnail' => array(
+      'label' => t('Video/imagen en miniatura'), 
+      'field types' => array('file'),
+      'description' => t('Muestra el video o la imagen en formato miniatura'),
+    ), 
+  );
+  return $info;
+}
+
+/**
+* Implements hook_field_formatter_view().
+*/
+function novocar_coche_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+
+  if ($entity_type == 'node' && $entity->type == 'coche') {
+
+    $element = array();
+
+    switch ($display['type']) {
+      case 'media':
+
+	foreach ($items as $delta => $item) {
+
+	  $element[$delta] = array(
+	    '#theme' => 'novocar_coche_media', 
+	    '#url'   => $entity->{$field['field_name']}[$langcode][0]['uri'], 
+	    '#mime'  => $entity->{$field['field_name']}[$langcode][0]['filemime'], 
+	  );
+	}
+      break;
+
+      case 'media_thumbnail':
+
+	foreach ($items as $delta => $item) {
+
+	  $element[$delta] = array(
+	    '#theme' => 'novocar_coche_media_thumbnail', 
+	    '#url'   => $entity->{$field['field_name']}[$langcode][0]['uri'], 
+	    '#mime'  => $entity->{$field['field_name']}[$langcode][0]['filemime'], 
+	  );
+	}
+      break;
+
+    }
+    return $element;
+  }
+}
+
+/**
+ * Implements hook_ds_fields_info().
+ */
+function novocar_coche_ds_fields_info($entity_type) {
+
+  $fields = array();
+
+  $fields['node']['novocar_coche_media'] = array(
+    'title'      => 'Novocar carousel',
+    'field_type' => DS_FIELD_TYPE_FUNCTION,
+    'function'   => 'novocar_coche_media_ds_callback',
+    'file'       => drupal_get_path('module', 'novocar_coche') . '/inc/novocar_coche.ds.inc',
+  );
+
+  $fields['node']['novocar_coche_pdf'] = array(
+    'title'      => 'Novocar: PDF',
+    'field_type' => DS_FIELD_TYPE_FUNCTION,
+    'function'   => 'novocar_coche_pdf_ds_callback',
+    'file'       => drupal_get_path('module', 'novocar_coche') . '/inc/novocar_coche.ds.inc',
+  );
+
+  $fields['node']['novocar_coche_new_search'] = array(
+    'title'      => 'Novocar: Seguir buscando',
+    'field_type' => DS_FIELD_TYPE_FUNCTION,
+    'function'   => 'novocar_coche_new_search_callback',
+    'file'       => drupal_get_path('module', 'novocar_coche') . '/inc/novocar_coche.ds.inc',
+  );
+
+  $fields['node']['novocar_coche_general_info'] = array(
+    'title'      => 'Novocar: Información general',
+    'field_type' => DS_FIELD_TYPE_FUNCTION,
+    'function'   => 'novocar_coche_general_info_callback',
+    'file'       => drupal_get_path('module', 'novocar_coche') . '/inc/novocar_coche.ds.inc',
+  );
+
+  if (isset($fields[$entity_type])) {
+    return array($entity_type => $fields[$entity_type]);
+  }
+
+  return;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function novocar_coche_theme() {
+  return array(
+    'novocar_coche_media' => array(
+      'variables' => array(
+        'url'  => NULL,
+        'mime' => NULL,
+      ),      
+      'path'      => drupal_get_path('module', 'novocar_coche') . '/theme',
+      'template'  => 'novocar-coche-media',
+    ),
+    'novocar_coche_media_thumbnail' => array(
+      'variables' => array(
+        'url'  => NULL,
+        'mime' => NULL,
+      ),      
+      'path'      => drupal_get_path('module', 'novocar_coche') . '/theme',
+      'template'  => 'novocar-coche-media-thumbnail',
+    ),
+  );
+}
+
+/**
+ * Implements template_preprocess_novocar_coche_media().
+ */
+function template_preprocess_novocar_coche_media(&$vars) {
+
+  drupal_add_css(drupal_get_path('module', 'novocar_coche') . '/css/novocar_coche.css');
+  drupal_add_js(drupal_get_path('module', 'novocar_coche') . '/js/novocar_coche.js');
+
+  $vars['media'] = NULL;
+
+  if (isset($vars['mime']) && $vars['mime'] && isset($vars['url']) && $vars['url']) {
+    switch ($vars['mime']) {
+  
+      case 'video/youtube':
+
+	$vars['type']  = 'video';
+	$vars['media'] = novocar_general_get_embed_from_youtube_url($vars['url']);
+
+      break;
+
+      case 'image/jpeg':
+
+	$image_vars = array(
+	  'style_name' => 'scale_crop_600_320',
+	  'path'       => $vars['url'],
+	  'width'      => '',
+	  'height'     => '',
+	);
+
+	$vars['type']  = 'image';
+	$vars['media'] = theme_image_style($image_vars);
+      break;
+    }
+  }
+}
+
+/**
+ * Implements template_preprocess_novocar_coche_media_thumbnail().
+ */
+function template_preprocess_novocar_coche_media_thumbnail(&$vars) {
+
+  $vars['media'] = NULL;
+
+  if (isset($vars['mime']) && $vars['mime'] && isset($vars['url']) && $vars['url']) {
+    switch ($vars['mime']) {
+  
+      case 'video/youtube':
+
+	$image_vars = array(
+	  'path' => novocar_general_get_thumbnail_from_youtube_url($vars['url'], 1),
+	  'width' => '',
+	  'height' => '',
+	  'attributes' => array(),
+	);
+
+	$vars['type']  = 'video';
+	$vars['media'] = theme_image($image_vars);
+
+      break;
+
+      case 'image/jpeg':
+
+	$image_vars = array(
+	  'style_name' => 'scale_crop_116_60',
+	  'path'       => $vars['url'],
+	  'width'      => '',
+	  'height'     => '',
+	);
+
+	$vars['type']  = 'image';
+	$vars['media'] = theme_image_style($image_vars);
+      break;
+    }
+  }
+}

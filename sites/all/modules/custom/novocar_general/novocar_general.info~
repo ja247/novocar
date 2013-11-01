@@ -1,0 +1,6 @@
+name = Novocar Contact
+description = Módulo que añade la funcionalidad de contacto específico para Novocar.
+package = Novocar
+core = 7.x
+
+dependencies[] = colorbox
